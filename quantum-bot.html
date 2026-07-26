@@ -1,0 +1,5919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0,
+               maximum-scale=1.0, viewport-fit=cover">
+
+<meta name="theme-color" content="#02040a">
+
+<meta name="description"
+      content="Quantum Bot — a futuristic AI assistant with chat, vision,
+               voice, image generation and quantum-inspired interface.">
+
+<title>Quantum Bot — AI Beyond Tomorrow</title>
+
+<!--
+    Google Identity Services — powers the "Continue with Google"
+    button. Requires a real Client ID (see GOOGLE_CLIENT_ID in the
+    script below) registered for this domain in Google Cloud Console.
+-->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<style>
+/* ============================================================
+   QUANTUM BOT
+   Single-file futuristic AI application
+   HTML + CSS + Vanilla JavaScript
+   ============================================================ */
+
+/* ---------- RESET ---------- */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+body {
+    min-height: 100vh;
+    overflow: hidden;
+    font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+    color: #eef7ff;
+    background: #02040a;
+}
+
+/* ---------- CSS VARIABLES ---------- */
+
+:root {
+    --bg: #02040a;
+    --bg2: #050914;
+    --panel: rgba(8, 14, 29, .68);
+    --panel-strong: rgba(9, 17, 35, .91);
+    --border: rgba(120, 211, 255, .15);
+
+    --text: #eef7ff;
+    --muted: #8292aa;
+
+    --cyan: #00eaff;
+    --blue: #438cff;
+    --purple: #a855f7;
+    --pink: #f45cff;
+
+    --accent: #00eaff;
+    --accent2: #7b61ff;
+
+    --danger: #ff5370;
+    --success: #37f2a3;
+
+    --radius: 22px;
+    --sidebar: 270px;
+
+    --blur: 25px;
+
+    --shadow:
+        0 20px 80px rgba(0,0,0,.5),
+        inset 0 1px rgba(255,255,255,.04);
+}
+
+/* ---------- LIGHT MODE ---------- */
+
+body.light {
+    --bg: #eef5ff;
+    --bg2: #dfeaff;
+    --panel: rgba(255,255,255,.67);
+    --panel-strong: rgba(255,255,255,.91);
+    --border: rgba(50,80,130,.16);
+
+    --text: #10182a;
+    --muted: #56657b;
+
+    background: #eef5ff;
+}
+
+/* ---------- SCROLLBARS ---------- */
+
+::-webkit-scrollbar {
+    width: 7px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0,234,255,.2);
+    border-radius: 20px;
+}
+
+/* ============================================================
+   INTRO
+   ============================================================ */
+
+#intro {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    display: grid;
+    place-items: center;
+
+    background:
+        radial-gradient(circle at center,
+        rgba(0,234,255,.08),
+        transparent 30%),
+        #000;
+
+    transition:
+        opacity 1.1s ease,
+        visibility 1.1s ease;
+}
+
+#intro.hide {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+#intro.shake {
+    animation: shakeScreen .55s linear 3;
+}
+
+.atom-intro {
+    position: relative;
+    width: 230px;
+    height: 230px;
+
+    animation: atomShake .12s linear infinite;
+}
+
+.atom-intro.launching {
+    animation:
+        atomShake .06s linear infinite,
+        atomLaunch 1.45s ease-in-out forwards;
+}
+
+.atom-intro.launching .nucleus {
+    animation:
+        nucleusPulse 1s ease-in-out infinite,
+        nucleusSurge 1.45s ease-out forwards;
+}
+
+.atom-intro.launching .orbit {
+    animation:
+        orbitSpin 1.6s linear infinite,
+        orbitDrift 1.45s ease-in-out forwards;
+}
+
+.nucleus {
+    position: absolute;
+    width: 52px;
+    height: 52px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(circle at 35% 30%,
+        #fff,
+        var(--cyan) 22%,
+        #008cff 55%,
+        #4610ff);
+
+    box-shadow:
+        0 0 15px #fff,
+        0 0 35px var(--cyan),
+        0 0 80px var(--blue),
+        0 0 140px rgba(112,70,255,.8);
+
+    animation: nucleusPulse 1.2s ease-in-out infinite;
+}
+
+.orbit {
+    position: absolute;
+    inset: 0;
+
+    border: 1px solid rgba(0,234,255,.4);
+    border-radius: 50%;
+
+    box-shadow:
+        0 0 18px rgba(0,234,255,.1),
+        inset 0 0 18px rgba(0,234,255,.08);
+}
+
+.orbit:nth-child(2) {
+    transform: rotate(60deg) scaleY(.48);
+}
+
+.orbit:nth-child(3) {
+    transform: rotate(-60deg) scaleY(.48);
+}
+
+.electron {
+    position: absolute;
+
+    width: 11px;
+    height: 11px;
+
+    left: calc(50% - 5px);
+    top: -5px;
+
+    border-radius: 50%;
+
+    background: white;
+
+    box-shadow:
+        0 0 8px white,
+        0 0 20px var(--cyan),
+        0 0 40px var(--blue);
+}
+
+.orbit {
+    animation: orbitSpin 2.4s linear infinite;
+}
+
+.orbit:nth-child(2) {
+    animation-duration: 1.9s;
+}
+
+.orbit:nth-child(3) {
+    animation-duration: 3.1s;
+}
+
+.intro-title {
+    position: absolute;
+    top: calc(50% + 155px);
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    font-size: clamp(28px, 6vw, 58px);
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    white-space: nowrap;
+
+    color: white;
+
+    text-shadow:
+        0 0 10px var(--cyan),
+        0 0 30px var(--blue),
+        0 0 70px var(--purple);
+}
+
+.typing-cursor {
+    display: inline-block;
+    width: 3px;
+    height: .9em;
+
+    margin-left: 5px;
+
+    background: var(--cyan);
+
+    box-shadow: 0 0 12px var(--cyan);
+
+    animation: blink .6s infinite;
+}
+
+.energy-burst {
+    position: absolute;
+
+    width: 20px;
+    height: 20px;
+
+    border-radius: 50%;
+
+    background: white;
+
+    box-shadow:
+        0 0 30px white,
+        0 0 80px var(--cyan),
+        0 0 180px var(--purple);
+
+    opacity: 0;
+
+    pointer-events: none;
+}
+
+.energy-burst.explode {
+    animation: explosion 1.5s cubic-bezier(.1,.7,.1,1) forwards;
+}
+
+/* ============================================================
+   INTRO — NUCLEON BUILD SEQUENCE
+   ============================================================ */
+
+.atom-intro .nucleus {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+    transition: opacity .5s ease, transform .5s cubic-bezier(.2,1.6,.4,1);
+}
+
+.atom-intro.nucleons-in .nucleus {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.nucleon {
+    position: absolute;
+
+    width: 22px;
+    height: 22px;
+
+    border-radius: 50%;
+
+    opacity: 0;
+
+    transition:
+        transform 1s cubic-bezier(.2,1.4,.3,1),
+        opacity .6s ease;
+}
+
+.nucleon.proton {
+    background:
+        radial-gradient(circle at 35% 30%, #fff, #ff5cae 30%, #b3006b);
+
+    box-shadow:
+        0 0 10px #fff,
+        0 0 22px #ff5cae,
+        0 0 45px #b3006b;
+}
+
+.nucleon.neutron {
+    background:
+        radial-gradient(circle at 35% 30%, #fff, #7ad0ff 30%, #0b63c4);
+
+    box-shadow:
+        0 0 10px #fff,
+        0 0 22px #7ad0ff,
+        0 0 45px #0b63c4;
+}
+
+.atom-intro.nucleons-in .nucleon {
+    opacity: 1;
+}
+
+.atom-intro .nucleon:nth-child(2) { transform: translate(52px, -34px) scale(.4); }
+.atom-intro.nucleons-in .nucleon:nth-child(2) { transform: translate(-6px, -8px) scale(1); }
+
+.atom-intro .nucleon:nth-child(3) { transform: translate(-58px, -22px) scale(.4); }
+.atom-intro.nucleons-in .nucleon:nth-child(3) { transform: translate(6px, -8px) scale(1); }
+
+.atom-intro .nucleon:nth-child(4) { transform: translate(46px, 40px) scale(.4); }
+.atom-intro.nucleons-in .nucleon:nth-child(4) { transform: translate(7px, 7px) scale(1); }
+
+.atom-intro .nucleon:nth-child(5) { transform: translate(-50px, 36px) scale(.4); }
+.atom-intro.nucleons-in .nucleon:nth-child(5) { transform: translate(-7px, 7px) scale(1); }
+
+.atom-intro .nucleon:nth-child(6) { transform: translate(0, -60px) scale(.4); }
+.atom-intro.nucleons-in .nucleon:nth-child(6) { transform: translate(0, -10px) scale(1); }
+
+.atom-intro .nucleon:nth-child(7) { transform: translate(0, 60px) scale(.4); }
+.atom-intro.nucleons-in .nucleon:nth-child(7) { transform: translate(0, 10px) scale(1); }
+
+/* electrons/orbits fade in only after nucleons settle */
+
+.atom-intro .orbit {
+    opacity: 0;
+    transition: opacity .6s ease;
+}
+
+.atom-intro.electrons-in .orbit {
+    opacity: 1;
+}
+
+/* whole-atom break-apart before going to main menu */
+
+.atom-intro.breaking .nucleus,
+.atom-intro.breaking .nucleon {
+    transition: transform .8s ease-in, opacity .8s ease-in;
+    opacity: 0;
+}
+
+.atom-intro.breaking .nucleon:nth-child(2) { transform: translate(140px, -110px) scale(0); }
+.atom-intro.breaking .nucleon:nth-child(3) { transform: translate(-150px, -70px) scale(0); }
+.atom-intro.breaking .nucleon:nth-child(4) { transform: translate(120px, 130px) scale(0); }
+.atom-intro.breaking .nucleon:nth-child(5) { transform: translate(-130px, 120px) scale(0); }
+.atom-intro.breaking .nucleon:nth-child(6) { transform: translate(20px, -180px) scale(0); }
+.atom-intro.breaking .nucleon:nth-child(7) { transform: translate(-20px, 180px) scale(0); }
+.atom-intro.breaking .nucleus { transform: translate(-50%,-50%) scale(0); }
+
+.atom-intro.breaking .orbit {
+    transition: transform .8s ease-in, opacity .8s ease-in;
+    opacity: 0;
+}
+
+.atom-intro.breaking .orbit:nth-child(8) { transform: scale(2.4) rotate(35deg); }
+.atom-intro.breaking .orbit:nth-child(9) { transform: scale(2.4) rotate(-35deg) scaleY(.48); }
+.atom-intro.breaking .orbit:nth-child(10) { transform: scale(2.4) rotate(90deg) scaleY(.48); }
+
+/* ============================================================
+   LOGIN
+   ============================================================ */
+
+#login {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+
+    display: grid;
+    place-items: center;
+
+    padding: 20px;
+
+    background:
+        radial-gradient(circle at center,
+        rgba(0,234,255,.08),
+        transparent 40%),
+        #000;
+
+    opacity: 1;
+    visibility: visible;
+
+    transition: opacity .6s ease, visibility .6s ease;
+}
+
+#login.hide {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.login-card {
+    width: min(380px, 100%);
+
+    padding: 34px 28px;
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+
+    background: var(--panel-strong);
+
+    box-shadow: var(--shadow);
+
+    backdrop-filter: blur(var(--blur));
+
+    text-align: center;
+}
+
+.login-orb {
+    width: 60px;
+    height: 60px;
+
+    margin: 0 auto 18px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(circle at 35% 30%,
+        #fff,
+        var(--cyan) 22%,
+        #008cff 55%,
+        #4610ff);
+
+    box-shadow:
+        0 0 15px #fff,
+        0 0 35px var(--cyan),
+        0 0 80px var(--blue);
+
+    animation: nucleusPulse 2.4s ease-in-out infinite;
+}
+
+.login-card h2 {
+    margin-bottom: 6px;
+    font-size: 20px;
+    letter-spacing: .04em;
+}
+
+.login-card > p {
+    margin-bottom: 24px;
+    color: var(--muted);
+    font-size: 12.5px;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    text-align: left;
+    margin-bottom: 16px;
+}
+
+.login-form label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 4px;
+    display: block;
+}
+
+.login-form input {
+    width: 100%;
+
+    padding: 11px 13px;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    outline: none;
+
+    color: var(--text);
+
+    background: rgba(0,0,0,.25);
+
+    font-size: 13px;
+}
+
+.login-form input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,234,255,.08);
+}
+
+.login-error {
+    display: none;
+
+    margin-bottom: 12px;
+
+    padding: 9px 12px;
+
+    border: 1px solid rgba(255,83,112,.35);
+    border-radius: 10px;
+
+    background: rgba(255,83,112,.08);
+
+    color: var(--danger);
+
+    font-size: 12px;
+    text-align: left;
+}
+
+.login-error.show {
+    display: block;
+}
+
+.login-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin: 18px 0;
+
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+
+.login-divider::before,
+.login-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
+#googleSignInBtn {
+    display: flex;
+    justify-content: center;
+}
+
+.login-switch {
+    margin-top: 18px;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.login-switch button {
+    background: none;
+    border: none;
+    color: var(--cyan);
+    cursor: pointer;
+    font-size: 12px;
+    text-decoration: underline;
+    padding: 0;
+}
+
+.login-guest {
+    margin-top: 10px;
+}
+
+/* ============================================================
+   BACKGROUND
+   ============================================================ */
+
+#universe {
+    position: fixed;
+    inset: 0;
+    z-index: -5;
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% 20%,
+            rgba(0,234,255,.08),
+            transparent 35%
+        ),
+        radial-gradient(
+            circle at 80% 80%,
+            rgba(168,85,247,.08),
+            transparent 35%
+        ),
+        var(--bg);
+}
+
+#particleCanvas {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+}
+
+.grid {
+    position: absolute;
+    inset: -20%;
+
+    background-image:
+        linear-gradient(rgba(0,234,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,234,255,.035) 1px, transparent 1px);
+
+    background-size: 60px 60px;
+
+    transform:
+        perspective(500px)
+        rotateX(55deg)
+        translateY(25%);
+
+    animation: gridMove 18s linear infinite;
+}
+
+.wave {
+    position: absolute;
+
+    width: 800px;
+    height: 800px;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+
+    border-radius: 50%;
+
+    border: 1px solid rgba(0,234,255,.07);
+
+    animation: waveExpand 6s ease-in-out infinite;
+}
+
+.wave:nth-child(2) {
+    animation-delay: 2s;
+}
+
+.wave:nth-child(3) {
+    animation-delay: 4s;
+}
+
+.bg-atom {
+    position: absolute;
+
+    width: 100px;
+    height: 100px;
+
+    border: 1px solid rgba(0,234,255,.13);
+
+    border-radius: 50%;
+
+    opacity: .7;
+    animation: floatAtom 12s ease-in-out infinite;
+}
+
+.bg-atom::after,
+.bg-atom::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    border: inherit;
+    border-radius: inherit;
+}
+
+.bg-atom::after {
+    transform: rotate(60deg) scaleY(.5);
+}
+
+.bg-atom::before {
+    transform: rotate(-60deg) scaleY(.5);
+}
+
+.bg-atom:nth-of-type(1) {
+    left: 8%;
+    top: 20%;
+}
+
+.bg-atom:nth-of-type(2) {
+    right: 10%;
+    top: 15%;
+    animation-delay: 3s;
+    transform: scale(1.5);
+}
+
+.bg-atom:nth-of-type(3) {
+    right: 20%;
+    bottom: 10%;
+    animation-delay: 5s;
+    transform: scale(.7);
+}
+
+/* ============================================================
+   APP SHELL
+   ============================================================ */
+
+#app {
+    position: relative;
+
+    display: grid;
+    grid-template-columns: var(--sidebar) 1fr;
+
+    height: 100dvh;
+
+    opacity: 0;
+    transform: scale(.98);
+
+    transition:
+        opacity 1s ease,
+        transform 1s ease;
+}
+
+#app.ready {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+
+.sidebar {
+    position: relative;
+    z-index: 20;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 20px;
+
+    background: rgba(2,5,14,.62);
+
+    border-right: 1px solid var(--border);
+
+    backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
+}
+
+body.light .sidebar {
+    background: rgba(255,255,255,.56);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 10px 8px 22px;
+}
+
+.brand-icon {
+    position: relative;
+
+    display: grid;
+    place-items: center;
+
+    width: 42px;
+    height: 42px;
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(135deg,
+        rgba(0,234,255,.2),
+        rgba(123,97,255,.3));
+
+    border: 1px solid rgba(0,234,255,.35);
+
+    box-shadow:
+        0 0 25px rgba(0,234,255,.16);
+}
+
+.brand-icon::before {
+    content: "Q";
+
+    font-weight: 900;
+    font-size: 20px;
+
+    color: var(--cyan);
+
+    text-shadow: 0 0 15px var(--cyan);
+}
+
+.brand-text strong {
+    display: block;
+
+    font-size: 16px;
+    letter-spacing: .08em;
+}
+
+.brand-text span {
+    display: block;
+
+    margin-top: 2px;
+
+    font-size: 10px;
+    color: var(--muted);
+
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+
+.new-chat {
+    width: 100%;
+
+    padding: 13px 15px;
+
+    border: 1px solid rgba(0,234,255,.3);
+    border-radius: 14px;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(0,234,255,.12),
+            rgba(123,97,255,.12)
+        );
+
+    cursor: pointer;
+
+    transition: .25s;
+
+    box-shadow:
+        0 0 25px rgba(0,234,255,.04);
+}
+
+.new-chat:hover {
+    transform: translateY(-2px);
+
+    border-color: var(--cyan);
+
+    box-shadow:
+        0 0 30px rgba(0,234,255,.16);
+}
+
+.nav-label {
+    margin: 24px 8px 9px;
+
+    color: var(--muted);
+
+    font-size: 10px;
+    font-weight: 700;
+
+    letter-spacing: .15em;
+    text-transform: uppercase;
+}
+
+.nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nav button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    width: 100%;
+
+    padding: 11px 12px;
+
+    border: 1px solid transparent;
+    border-radius: 12px;
+
+    color: var(--muted);
+
+    background: transparent;
+
+    cursor: pointer;
+
+    text-align: left;
+
+    transition: .2s;
+}
+
+.nav button:hover,
+.nav button.active {
+    color: var(--text);
+
+    background: rgba(0,234,255,.07);
+
+    border-color: rgba(0,234,255,.12);
+}
+
+.nav button.active {
+    box-shadow:
+        inset 3px 0 var(--accent),
+        0 0 25px rgba(0,234,255,.04);
+}
+
+.nav-icon {
+    width: 20px;
+
+    text-align: center;
+
+    font-size: 15px;
+}
+
+.sidebar-bottom {
+    margin-top: auto;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 10px;
+
+    border: 1px solid var(--border);
+    border-radius: 15px;
+
+    background: rgba(255,255,255,.025);
+}
+
+.avatar {
+    display: grid;
+    place-items: center;
+
+    flex-shrink: 0;
+
+    width: 35px;
+    height: 35px;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(135deg,
+        var(--cyan),
+        var(--purple));
+
+    color: #02040a;
+
+    font-weight: 900;
+}
+
+.profile-name {
+    overflow: hidden;
+
+    font-size: 12px;
+}
+
+.profile-name span {
+    display: block;
+
+    color: var(--muted);
+
+    font-size: 10px;
+}
+
+/* ============================================================
+   MAIN
+   ============================================================ */
+
+.main {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    position: relative;
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    height: 70px;
+
+    padding: 0 28px;
+
+    border-bottom: 1px solid var(--border);
+
+    background: rgba(2,4,10,.2);
+
+    backdrop-filter: blur(20px);
+}
+
+.top-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: var(--success);
+
+    box-shadow: 0 0 12px var(--success);
+
+    animation: pulseDot 1.5s infinite;
+}
+
+.top-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.icon-button {
+    display: grid;
+    place-items: center;
+
+    width: 38px;
+    height: 38px;
+
+    border: 1px solid var(--border);
+    border-radius: 11px;
+
+    color: var(--muted);
+
+    background: rgba(255,255,255,.025);
+
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+.icon-button:hover {
+    color: var(--text);
+
+    border-color: rgba(0,234,255,.3);
+
+    box-shadow: 0 0 20px rgba(0,234,255,.08);
+}
+
+/* ============================================================
+   VIEWS
+   ============================================================ */
+
+.views {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+}
+
+.view {
+    position: absolute;
+    inset: 0;
+
+    display: none;
+
+    overflow: hidden;
+
+    padding: 30px;
+}
+
+.view.active {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+/* ============================================================
+   CHAT
+   ============================================================ */
+
+.chat-view {
+    padding-bottom: 0;
+    min-height: 0;
+}
+
+.messages {
+    flex: 1;
+    min-height: 0;
+    width: min(950px, 100%);
+
+    margin: 0 auto;
+
+    overflow-y: auto;
+    padding-bottom: 120px;
+    scroll-padding-bottom: 120px;
+    overscroll-behavior-y: contain;
+}
+
+.welcome {
+    min-height: 55vh;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+}
+
+.welcome-orb {
+    position: relative;
+
+    width: 100px;
+    height: 100px;
+
+    margin-bottom: 25px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at 35% 30%,
+            white 0%,
+            var(--cyan) 8%,
+            rgba(0,140,255,.5) 30%,
+            rgba(123,97,255,.2) 60%,
+            transparent 70%
+        );
+
+    box-shadow:
+        0 0 30px var(--cyan),
+        0 0 100px rgba(67,140,255,.4),
+        0 0 160px rgba(168,85,247,.25);
+
+    animation:
+        orbFloat 4s ease-in-out infinite,
+        orbPulse 2s ease-in-out infinite;
+}
+
+.welcome-orb::after {
+    content: "";
+
+    position: absolute;
+    inset: -18px;
+
+    border: 1px solid rgba(0,234,255,.3);
+    border-radius: 50%;
+
+    animation: orbitSpin 6s linear infinite;
+}
+
+.welcome h1 {
+    font-size: clamp(32px, 5vw, 58px);
+    line-height: 1;
+
+    letter-spacing: -.05em;
+}
+
+.gradient-text {
+    background:
+        linear-gradient(
+            90deg,
+            var(--cyan),
+            #fff,
+            var(--purple)
+        );
+
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    color: transparent;
+
+    background-size: 200%;
+
+    animation: gradientMove 5s linear infinite;
+}
+
+.welcome p {
+    max-width: 600px;
+
+    margin-top: 16px;
+
+    color: var(--muted);
+
+    line-height: 1.7;
+}
+
+.suggestions {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+
+    width: min(850px, 100%);
+
+    margin-top: 30px;
+
+    gap: 10px;
+}
+
+.suggestion {
+    padding: 15px;
+
+    border: 1px solid var(--border);
+    border-radius: 16px;
+
+    color: var(--muted);
+
+    background: rgba(255,255,255,.025);
+
+    cursor: pointer;
+
+    text-align: left;
+
+    transition: .25s;
+}
+
+.suggestion:hover {
+    color: var(--text);
+
+    border-color: rgba(0,234,255,.35);
+
+    transform: translateY(-3px);
+
+    background: rgba(0,234,255,.05);
+}
+
+.suggestion b {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: var(--text);
+
+    font-size: 12px;
+}
+
+.suggestion span {
+    font-size: 11px;
+}
+
+/* ---------- MESSAGE ---------- */
+
+.message {
+    display: flex;
+    gap: 13px;
+
+    margin: 25px 0;
+
+    animation: messageIn .35s ease both;
+}
+
+.message.user {
+    flex-direction: row-reverse;
+}
+
+.message-avatar {
+    display: grid;
+    place-items: center;
+
+    flex-shrink: 0;
+
+    width: 35px;
+    height: 35px;
+
+    border-radius: 12px;
+
+    border: 1px solid var(--border);
+
+    background: rgba(255,255,255,.04);
+
+    color: var(--cyan);
+
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.message.user .message-avatar {
+    color: white;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--blue),
+            var(--purple)
+        );
+}
+
+.message-body {
+    max-width: min(760px, 82%);
+}
+
+.message-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-bottom: 5px;
+
+    color: var(--muted);
+
+    font-size: 10px;
+}
+
+.message.user .message-meta {
+    justify-content: flex-end;
+}
+
+.bubble {
+    padding: 14px 17px;
+
+    border: 1px solid var(--border);
+    border-radius: 5px 18px 18px 18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.045),
+            rgba(0,234,255,.025)
+        );
+
+    line-height: 1.7;
+
+    font-size: 14px;
+}
+
+.message.user .bubble {
+    border-radius: 18px 5px 18px 18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(67,140,255,.14),
+            rgba(168,85,247,.12)
+        );
+}
+
+.bubble code {
+    padding: 2px 6px;
+
+    border-radius: 5px;
+
+    background: rgba(0,0,0,.35);
+
+    color: var(--cyan);
+
+    font-family: "SFMono-Regular", Consolas, monospace;
+}
+
+.code-wrap {
+    position: relative;
+
+    margin: 12px 0;
+
+    overflow: hidden;
+
+    border: 1px solid rgba(0,234,255,.13);
+    border-radius: 13px;
+
+    background: #02040a;
+}
+
+.code-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 8px 12px;
+
+    border-bottom: 1px solid rgba(255,255,255,.06);
+
+    color: var(--muted);
+
+    font-size: 10px;
+}
+
+.copy-code {
+    border: 0;
+
+    color: var(--cyan);
+
+    background: transparent;
+
+    cursor: pointer;
+}
+
+pre {
+    padding: 15px;
+
+    overflow-x: auto;
+
+    font-size: 12px;
+    line-height: 1.65;
+}
+
+.typing {
+    display: flex;
+    gap: 5px;
+
+    padding: 6px;
+}
+
+.typing i {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: var(--cyan);
+
+    box-shadow: 0 0 10px var(--cyan);
+
+    animation: typing .8s infinite;
+}
+
+.typing i:nth-child(2) {
+    animation-delay: .15s;
+}
+
+.typing i:nth-child(3) {
+    animation-delay: .3s;
+}
+
+/* ============================================================
+   COMPOSER
+   ============================================================ */
+
+.composer-zone {
+    position: relative;
+    z-index: 5;
+
+    padding: 15px 30px calc(22px + env(safe-area-inset-bottom));
+
+    background:
+        linear-gradient(
+            to top,
+            var(--bg) 50%,
+            transparent
+        );
+}
+
+.composer {
+    position: relative;
+
+    width: min(900px, 100%);
+
+    margin: auto;
+
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+
+    padding: 9px;
+
+    border: 1px solid rgba(0,234,255,.18);
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(8,15,32,.9),
+            rgba(9,10,30,.85)
+        );
+
+    box-shadow:
+        0 20px 80px rgba(0,0,0,.4),
+        0 0 40px rgba(0,234,255,.04);
+
+    backdrop-filter: blur(25px);
+
+    transition: .25s;
+}
+
+.composer:focus-within {
+    border-color: rgba(0,234,255,.5);
+
+    box-shadow:
+        0 20px 80px rgba(0,0,0,.4),
+        0 0 40px rgba(0,234,255,.1);
+}
+
+.composer textarea {
+    flex: 1;
+
+    min-height: 44px;
+    max-height: 150px;
+
+    padding: 12px 8px;
+
+    resize: none;
+    overflow-y: auto;
+
+    outline: none;
+
+    border: 0;
+
+    color: var(--text);
+
+    background: transparent;
+
+    font: inherit;
+    font-size: 16px;
+    line-height: 1.45;
+}
+
+.composer textarea::placeholder {
+    color: #65758d;
+}
+
+.attach {
+    position: relative;
+}
+
+#imageInput {
+    display: none;
+}
+
+.send {
+    display: grid;
+    place-items: center;
+
+    width: 44px;
+    height: 44px;
+
+    flex-shrink: 0;
+
+    border: 0;
+    border-radius: 14px;
+
+    color: #001018;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--cyan),
+            var(--blue)
+        );
+
+    cursor: pointer;
+
+    box-shadow:
+        0 0 25px rgba(0,234,255,.18);
+
+    transition: .25s;
+}
+
+.send:hover {
+    transform: scale(1.05);
+
+    box-shadow:
+        0 0 35px rgba(0,234,255,.4);
+}
+
+.disclaimer {
+    width: min(900px, 100%);
+
+    margin: 7px auto 0;
+
+    text-align: center;
+
+    color: #58687d;
+
+    font-size: 9px;
+}
+
+/* ============================================================
+   GENERAL CARDS
+   ============================================================ */
+
+.page-header {
+    width: min(1000px, 100%);
+    margin: 0 auto 25px;
+}
+
+.page-header h2 {
+    font-size: 28px;
+    letter-spacing: -.03em;
+}
+
+.page-header p {
+    margin-top: 6px;
+
+    color: var(--muted);
+
+    font-size: 13px;
+}
+
+.card-grid {
+    width: min(1000px, 100%);
+
+    margin: 0 auto;
+
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 15px;
+}
+
+.card {
+    padding: 22px;
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.04),
+            rgba(0,234,255,.018)
+        );
+
+    box-shadow: var(--shadow);
+
+    backdrop-filter: blur(20px);
+}
+
+.card h3 {
+    margin-bottom: 7px;
+
+    font-size: 14px;
+}
+
+.card p {
+    color: var(--muted);
+
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.card-icon {
+    width: 45px;
+    height: 45px;
+
+    display: grid;
+    place-items: center;
+
+    margin-bottom: 15px;
+
+    border-radius: 14px;
+
+    color: var(--cyan);
+
+    background: rgba(0,234,255,.08);
+
+    border: 1px solid rgba(0,234,255,.13);
+}
+
+/* ============================================================
+   IMAGE LAB
+   ============================================================ */
+
+.dropzone {
+    display: grid;
+    place-items: center;
+
+    min-height: 280px;
+
+    margin-bottom: 15px;
+
+    border: 1px dashed rgba(0,234,255,.3);
+    border-radius: 20px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(0,234,255,.06),
+            transparent 65%
+        );
+
+    text-align: center;
+
+    cursor: pointer;
+
+    transition: .25s;
+}
+
+.dropzone:hover,
+.dropzone.dragging {
+    border-color: var(--cyan);
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(0,234,255,.11),
+            transparent 65%
+        );
+}
+
+.dropzone-icon {
+    font-size: 38px;
+
+    margin-bottom: 10px;
+
+    filter:
+        drop-shadow(0 0 15px var(--cyan));
+}
+
+.preview {
+    max-width: 100%;
+    max-height: 400px;
+
+    display: none;
+
+    margin: 0 auto;
+
+    border-radius: 15px;
+}
+
+/* ============================================================
+   SETTINGS
+   ============================================================ */
+
+.setting {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 17px 0;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.setting:last-child {
+    border-bottom: 0;
+}
+
+.setting-info strong {
+    display: block;
+
+    font-size: 13px;
+}
+
+.setting-info span {
+    display: block;
+
+    margin-top: 3px;
+
+    color: var(--muted);
+
+    font-size: 11px;
+}
+
+select,
+input[type="text"],
+input[type="password"] {
+    width: 220px;
+
+    padding: 10px 12px;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    outline: none;
+
+    color: var(--text);
+
+    background: rgba(0,0,0,.2);
+}
+
+input[type="color"] {
+    width: 45px;
+    height: 35px;
+
+    border: 0;
+    border-radius: 8px;
+
+    background: transparent;
+
+    cursor: pointer;
+}
+
+.toggle {
+    position: relative;
+
+    width: 44px;
+    height: 24px;
+}
+
+.toggle input {
+    display: none;
+}
+
+.slider {
+    position: absolute;
+    inset: 0;
+
+    border-radius: 30px;
+
+    background: #253149;
+
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+.slider::before {
+    content: "";
+
+    position: absolute;
+
+    width: 18px;
+    height: 18px;
+
+    top: 3px;
+    left: 3px;
+
+    border-radius: 50%;
+
+    background: white;
+
+    transition: .2s;
+}
+
+.toggle input:checked + .slider {
+    background: var(--accent);
+}
+
+.toggle input:checked + .slider::before {
+    transform: translateX(20px);
+}
+
+/* ============================================================
+   HISTORY
+   ============================================================ */
+
+.history-list {
+    width: min(850px, 100%);
+    margin: 0 auto;
+}
+
+.history-search {
+    width: 100% !important;
+    margin-bottom: 15px;
+}
+
+.history-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 15px;
+
+    margin-bottom: 7px;
+
+    border: 1px solid var(--border);
+    border-radius: 14px;
+
+    background: rgba(255,255,255,.025);
+
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+.history-item:hover {
+    border-color: rgba(0,234,255,.25);
+    background: rgba(0,234,255,.04);
+}
+
+.history-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.history-title {
+    overflow: hidden;
+
+    color: var(--text);
+
+    font-size: 13px;
+    font-weight: 600;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.history-date {
+    margin-top: 3px;
+
+    color: var(--muted);
+
+    font-size: 10px;
+}
+
+.delete-chat {
+    color: var(--muted);
+
+    border: 0;
+
+    background: transparent;
+
+    cursor: pointer;
+}
+
+.delete-chat:hover {
+    color: var(--danger);
+}
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+.mobile-menu {
+    display: none;
+}
+
+@media (max-width: 900px) {
+    :root {
+        --sidebar: 250px;
+    }
+
+    .suggestions {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 700px) {
+
+    body {
+        overflow: hidden;
+    }
+
+    #app {
+        display: block;
+        height: 100dvh;
+    }
+
+    .sidebar {
+        position: fixed;
+
+        top: 0;
+        bottom: 0;
+        left: 0;
+
+        width: 275px;
+
+        z-index: 100;
+
+        transform: translateX(-105%);
+
+        transition: transform .3s ease;
+
+        overflow-y: auto;
+        padding-bottom: calc(24px + env(safe-area-inset-bottom));
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .main {
+        width: 100%;
+        height: 100dvh;
+        min-height: 0;
+    }
+
+    .mobile-menu {
+        display: grid;
+    }
+
+    .topbar {
+        padding: 0 15px;
+    }
+
+    .view {
+        padding: 18px;
+    }
+
+    .composer-zone {
+        padding: 10px 12px calc(14px + env(safe-area-inset-bottom));
+    }
+
+    .suggestions {
+        grid-template-columns: 1fr;
+    }
+
+    .card-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .setting {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    select,
+    input[type="text"],
+    input[type="password"],
+    textarea {
+        width: 100%;
+        font-size: 16px;
+    }
+
+    .messages {
+        padding-bottom: 170px;
+        scroll-padding-bottom: 170px;
+    }
+
+    .message-body {
+        max-width: 86%;
+    }
+
+    .welcome {
+        min-height: 50vh;
+    }
+
+    .welcome h1 {
+        font-size: 38px;
+    }
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+
+@keyframes orbitSpin {
+    from {
+        transform: rotate(0deg) scaleY(.48);
+    }
+
+    to {
+        transform: rotate(360deg) scaleY(.48);
+    }
+}
+
+@keyframes nucleusPulse {
+    50% {
+        transform: translate(-50%, -50%) scale(1.12);
+    }
+}
+
+@keyframes atomShake {
+    0%,100% {
+        transform: translate(0);
+    }
+
+    50% {
+        transform: translate(1px,-1px);
+    }
+}
+
+@keyframes atomLaunch {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    35% {
+        transform: translate(-4px, 2px) scale(1.08);
+    }
+
+    70% {
+        transform: translate(10px, -8px) scale(1.25);
+    }
+
+    100% {
+        transform: translate(0, -22px) scale(.1);
+        opacity: 0;
+    }
+}
+
+@keyframes orbitDrift {
+    0% {
+        filter: blur(0);
+    }
+
+    45% {
+        filter: blur(.4px);
+    }
+
+    100% {
+        filter: blur(0);
+    }
+}
+
+@keyframes nucleusSurge {
+    0% {
+        box-shadow:
+            0 0 15px #fff,
+            0 0 35px var(--cyan),
+            0 0 80px var(--blue),
+            0 0 140px rgba(112,70,255,.8);
+    }
+
+    50% {
+        box-shadow:
+            0 0 22px #fff,
+            0 0 55px var(--cyan),
+            0 0 120px var(--blue),
+            0 0 210px rgba(112,70,255,.95);
+    }
+
+    100% {
+        box-shadow:
+            0 0 28px #fff,
+            0 0 70px var(--cyan),
+            0 0 150px var(--blue),
+            0 0 260px rgba(112,70,255,0);
+    }
+}
+
+@keyframes shakeScreen {
+    0%,100% {
+        transform: translate(0, 0);
+    }
+
+    20% {
+        transform: translate(-2px, 1px);
+    }
+
+    40% {
+        transform: translate(3px, -2px);
+    }
+
+    60% {
+        transform: translate(-4px, 2px);
+    }
+
+    80% {
+        transform: translate(2px, -1px);
+    }
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+@keyframes explosion {
+    0% {
+        opacity: 1;
+        transform: translate(-50%,-50%) scale(.1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%,-50%) scale(100);
+    }
+}
+
+@keyframes gridMove {
+    to {
+        transform:
+            perspective(500px)
+            rotateX(55deg)
+            translateY(30%);
+    }
+}
+
+@keyframes waveExpand {
+    0%,100% {
+        opacity: 0;
+        transform: translate(-50%,-50%) scale(.4);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translate(-50%,-50%) scale(1.3);
+    }
+}
+
+@keyframes floatAtom {
+    0%,100% {
+        transform: translate3d(0,0,0) rotate(0deg);
+    }
+
+    50% {
+        transform: translate3d(25px,-35px,0) rotate(180deg);
+    }
+}
+
+@keyframes pulseDot {
+    50% {
+        opacity: .4;
+        box-shadow: 0 0 4px var(--success);
+    }
+}
+
+@keyframes orbFloat {
+    50% {
+        transform: translateY(-12px);
+    }
+}
+
+@keyframes orbPulse {
+    50% {
+        filter: brightness(1.3);
+    }
+}
+
+@keyframes gradientMove {
+    to {
+        background-position: 200% 0;
+    }
+}
+
+@keyframes messageIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes typing {
+    0%,100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Reduced motion accessibility */
+
+body.reduce-motion *,
+body.reduce-motion *::before,
+body.reduce-motion *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .001ms !important;
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+
+.toast {
+    position: fixed;
+
+    z-index: 10000;
+
+    left: 50%;
+    bottom: 25px;
+
+    transform:
+        translate(-50%, 20px)
+        scale(.95);
+
+    opacity: 0;
+
+    padding: 11px 17px;
+
+    border: 1px solid rgba(0,234,255,.25);
+    border-radius: 12px;
+
+    color: var(--text);
+
+    background: rgba(5,10,23,.9);
+
+    box-shadow:
+        0 15px 50px rgba(0,0,0,.5),
+        0 0 25px rgba(0,234,255,.08);
+
+    backdrop-filter: blur(20px);
+
+    font-size: 12px;
+
+    pointer-events: none;
+
+    transition: .3s;
+}
+
+.toast.show {
+    opacity: 1;
+
+    transform:
+        translate(-50%, 0)
+        scale(1);
+}
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+
+.modal {
+    position: fixed;
+    inset: 0;
+
+    z-index: 500;
+
+    display: none;
+    place-items: center;
+
+    padding: 20px;
+
+    background: rgba(0,0,0,.6);
+
+    backdrop-filter: blur(10px);
+}
+
+.modal.show {
+    display: grid;
+}
+
+.modal-card {
+    width: min(520px, 100%);
+
+    padding: 25px;
+
+    border: 1px solid var(--border);
+    border-radius: 22px;
+
+    background: var(--panel-strong);
+
+    box-shadow:
+        0 30px 100px rgba(0,0,0,.6);
+}
+
+.modal-head {
+    display: flex;
+    justify-content: space-between;
+
+    margin-bottom: 20px;
+}
+
+.close-modal {
+    border: 0;
+
+    color: var(--muted);
+
+    background: transparent;
+
+    font-size: 20px;
+
+    cursor: pointer;
+}
+
+.btn {
+    padding: 10px 14px;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    color: var(--text);
+
+    background: rgba(255,255,255,.04);
+
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+.btn:hover {
+    border-color: var(--accent);
+
+    box-shadow: 0 0 20px rgba(0,234,255,.08);
+}
+
+.btn.primary {
+    color: #001018;
+
+    border: 0;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--accent),
+            var(--blue)
+        );
+}
+
+/* ============================================================
+   CURSOR GLOW
+   ============================================================ */
+
+#cursorGlow {
+    position: fixed;
+
+    z-index: 9998;
+
+    width: 180px;
+    height: 180px;
+
+    border-radius: 50%;
+
+    pointer-events: none;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(0,234,255,.08),
+            transparent 65%
+        );
+
+    transform: translate(-50%, -50%);
+
+    mix-blend-mode: screen;
+}
+
+@media (max-width: 700px) {
+    #cursorGlow {
+        display: none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ============================================================
+     LOGIN
+     ============================================================ -->
+
+<section id="login" aria-label="Sign in to Quantum Bot">
+
+    <div class="login-card">
+
+        <div class="login-orb"></div>
+
+        <h2>Quantum Bot</h2>
+        <p>Sign in to access your neural workspace.</p>
+
+        <div class="login-error" id="loginError"></div>
+
+        <form class="login-form" id="loginForm" autocomplete="on">
+
+            <div>
+                <label for="loginEmail">Email</label>
+                <input
+                    id="loginEmail"
+                    type="email"
+                    placeholder="you@example.com"
+                    autocomplete="email"
+                    required>
+            </div>
+
+            <div>
+                <label for="loginPassword">Password</label>
+                <input
+                    id="loginPassword"
+                    type="password"
+                    placeholder="••••••••"
+                    autocomplete="current-password"
+                    required
+                    minlength="6">
+            </div>
+
+            <button type="submit" class="btn primary" id="loginSubmit">
+                <span id="loginSubmitText">Sign In</span>
+            </button>
+
+        </form>
+
+        <div class="login-divider">or</div>
+
+        <div id="googleSignInBtn"></div>
+
+        <div class="login-switch">
+            <span id="loginSwitchLabel">Don't have an account?</span>
+            <button type="button" id="loginSwitchBtn">Create one</button>
+        </div>
+
+        <div class="login-switch login-guest">
+            <button type="button" id="guestBtn">Continue as guest</button>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ============================================================
+     INTRO
+     ============================================================ -->
+
+<section id="intro" aria-label="Quantum Bot introduction">
+
+    <div class="atom-intro" id="introAtom">
+
+        <div class="nucleus"></div>
+
+        <span class="nucleon proton"></span>
+        <span class="nucleon neutron"></span>
+        <span class="nucleon proton"></span>
+        <span class="nucleon neutron"></span>
+        <span class="nucleon proton"></span>
+        <span class="nucleon neutron"></span>
+
+        <div class="orbit">
+            <span class="electron"></span>
+        </div>
+
+        <div class="orbit">
+            <span class="electron"></span>
+        </div>
+
+        <div class="orbit">
+            <span class="electron"></span>
+        </div>
+
+    </div>
+
+    <div class="energy-burst" id="energyBurst"></div>
+
+    <div class="intro-title">
+        <span id="typedIntro"></span>
+        <span class="typing-cursor"></span>
+    </div>
+
+</section>
+
+<!-- ============================================================
+     UNIVERSE BACKGROUND
+     ============================================================ -->
+
+<div id="universe" aria-hidden="true">
+
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="grid"></div>
+
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+
+    <div class="bg-atom"></div>
+    <div class="bg-atom"></div>
+    <div class="bg-atom"></div>
+
+</div>
+
+<!-- ============================================================
+     APPLICATION
+     ============================================================ -->
+
+<div id="app">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon"></div>
+
+            <div class="brand-text">
+                <strong>QUANTUM BOT</strong>
+                <span>AI Beyond Tomorrow</span>
+            </div>
+
+        </div>
+
+        <button class="new-chat" id="newChat">
+            ＋ New Quantum Chat
+        </button>
+
+        <div class="nav-label">Workspace</div>
+
+        <nav class="nav">
+
+            <button class="active" data-view="chat">
+                <span class="nav-icon">◉</span>
+                AI Chat
+            </button>
+
+            <button data-view="history">
+                <span class="nav-icon">◷</span>
+                Chat History
+            </button>
+
+            <button data-view="image">
+                <span class="nav-icon">◇</span>
+                Image Lab
+            </button>
+
+            <button data-view="voice">
+                <span class="nav-icon">◌</span>
+                Voice Assistant
+            </button>
+
+        </nav>
+
+        <div class="nav-label">System</div>
+
+        <nav class="nav">
+
+            <button data-view="settings">
+                <span class="nav-icon">⚙</span>
+                Settings
+            </button>
+
+            <button id="themeQuick">
+                <span class="nav-icon">◐</span>
+                Theme Toggle
+            </button>
+
+            <button data-view="about">
+                <span class="nav-icon">ⓘ</span>
+                About Quantum
+            </button>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="profile">
+
+                <div class="avatar" id="sidebarAvatar">Q</div>
+
+                <div class="profile-name">
+                    <span id="sidebarName" style="display:block;color:var(--text);font-size:12px;">Quantum User</span>
+                    <span id="sidebarSub">Neural access enabled</span>
+                </div>
+
+                <button
+                    class="icon-button"
+                    id="signOutBtn"
+                    title="Sign out"
+                    style="margin-left:auto;">
+                    ⏻
+                </button>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+    <!-- MAIN -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div class="top-title">
+
+                <button
+                    class="icon-button mobile-menu"
+                    id="mobileMenu"
+                    aria-label="Open menu">
+                    ☰
+                </button>
+
+                <span class="status-dot"></span>
+
+                Quantum Neural Core
+            </div>
+
+            <div class="top-actions">
+
+                <button
+                    class="icon-button"
+                    id="clearChat"
+                    title="Clear conversation">
+                    ⌫
+                </button>
+
+                <button
+                    class="icon-button"
+                    id="exportChat"
+                    title="Export conversation">
+                    ⇩
+                </button>
+
+            </div>
+
+        </header>
+
+        <section class="views">
+
+            <!-- =================================================
+                 CHAT VIEW
+                 ================================================= -->
+
+            <section class="view chat-view active" id="view-chat">
+
+                <div class="messages" id="messages">
+
+                    <div class="welcome" id="welcome">
+
+                        <div class="welcome-orb"></div>
+
+                        <h1>
+                            Meet
+                            <span class="gradient-text">
+                                Quantum
+                            </span>
+                        </h1>
+
+                        <p>
+                            A futuristic AI interface for reasoning,
+                            coding, vision, creativity and voice.
+                            Ask anything and explore the quantum layer.
+                        </p>
+
+                        <div class="suggestions">
+
+                            <button class="suggestion"
+                                    data-prompt="Explain quantum computing in simple terms.">
+                                <b>Quantum Computing</b>
+                                <span>Explain a complex concept</span>
+                            </button>
+
+                            <button class="suggestion"
+                                    data-prompt="Write a modern JavaScript function that sorts an array efficiently.">
+                                <b>Build Code</b>
+                                <span>Create something useful</span>
+                            </button>
+
+                            <button class="suggestion"
+                                    data-prompt="Give me five creative startup ideas involving AI.">
+                                <b>Explore Ideas</b>
+                                <span>Generate possibilities</span>
+                            </button>
+
+                            <button class="suggestion"
+                                    data-prompt="Create a futuristic study plan for learning programming.">
+                                <b>Study Mode</b>
+                                <span>Build a learning roadmap</span>
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="composer-zone">
+
+                    <div class="composer">
+
+                        <label
+                            class="icon-button attach"
+                            title="Upload image">
+
+                            ＋
+
+                            <input
+                                id="imageInput"
+                                type="file"
+                                accept="image/*">
+
+                        </label>
+
+                        <button
+                            class="icon-button"
+                            id="voiceButton"
+                            title="Voice input">
+                            ◉
+                        </button>
+
+                        <textarea
+                            id="prompt"
+                            rows="1"
+                            aria-label="Message Quantum Bot"
+                            placeholder="Ask Quantum anything..."></textarea>
+
+                        <button
+                            class="send"
+                            id="sendButton"
+                            aria-label="Send message">
+                            ➤
+                        </button>
+
+                    </div>
+
+                    <div class="disclaimer">
+                        Quantum Bot can make mistakes. Verify important information.
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- =================================================
+                 HISTORY
+                 ================================================= -->
+
+            <section class="view" id="view-history">
+
+                <div class="page-header">
+                    <h2>Chat History</h2>
+                    <p>
+                        Your conversations are stored locally in this demo.
+                    </p>
+                </div>
+
+                <div class="history-list">
+
+                    <input
+                        class="history-search"
+                        id="historySearch"
+                        type="text"
+                        placeholder="Search conversations...">
+
+                    <div id="historyList"></div>
+
+                </div>
+
+            </section>
+
+            <!-- =================================================
+                 IMAGE LAB
+                 ================================================= -->
+
+            <section class="view" id="view-image">
+
+                <div class="page-header">
+                    <h2>Quantum Image Lab</h2>
+                    <p>
+                        Analyze images, extract text and prepare
+                        generation requests.
+                    </p>
+                </div>
+
+                <div class="card-grid">
+
+                    <div class="card">
+
+                        <div
+                            class="dropzone"
+                            id="dropzone">
+
+                            <div>
+
+                                <div class="dropzone-icon">
+                                    ◇
+                                </div>
+
+                                <strong>
+                                    Drop an image here
+                                </strong>
+
+                                <p>
+                                    or click to upload
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <img
+                            id="imagePreview"
+                            class="preview"
+                            alt="Uploaded image preview">
+
+                        <div style="
+                            display:flex;
+                            gap:8px;
+                            margin-top:15px;
+                            flex-wrap:wrap;">
+
+                            <button
+                                class="btn primary"
+                                id="analyzeImage">
+                                Analyze Image
+                            </button>
+
+                            <button
+                                class="btn"
+                                id="captionImage">
+                                Generate Caption
+                            </button>
+
+                            <button
+                                class="btn"
+                                id="ocrImage">
+                                OCR Text
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <div class="card">
+
+                        <div class="card-icon">✦</div>
+
+                        <h3>Image Generator</h3>
+
+                        <p>
+                            Describe the image you want Quantum Bot
+                            to generate. Connect this interface to
+                            an image API through your backend.
+                        </p>
+
+                        <textarea
+                            id="imagePrompt"
+                            style="
+                                width:100%;
+                                height:130px;
+                                margin-top:15px;
+                                padding:12px;
+                                resize:vertical;
+                                border:1px solid var(--border);
+                                border-radius:12px;
+                                outline:none;
+                                color:var(--text);
+                                background:rgba(0,0,0,.2);
+                                font:inherit;"
+                            placeholder="A futuristic city floating above a quantum ocean..."></textarea>
+
+                        <button
+                            class="btn primary"
+                            id="generateImage"
+                            style="margin-top:10px;">
+                            Generate Image
+                        </button>
+
+                        <div
+                            id="generatedImage"
+                            style="margin-top:15px;"></div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- =================================================
+                 VOICE
+                 ================================================= -->
+
+            <section class="view" id="view-voice">
+
+                <div class="page-header">
+                    <h2>Voice Assistant</h2>
+                    <p>
+                        Use speech recognition and browser speech synthesis.
+                    </p>
+                </div>
+
+                <div class="card-grid">
+
+                    <div class="card">
+
+                        <div class="card-icon">◉</div>
+
+                        <h3>Quantum Listening</h3>
+
+                        <p>
+                            Press the microphone to activate browser
+                            speech recognition.
+                        </p>
+
+                        <button
+                            class="btn primary"
+                            id="voiceStart"
+                            style="margin-top:20px;">
+                            Start Listening
+                        </button>
+
+                        <div
+                            id="voiceStatus"
+                            style="
+                                margin-top:15px;
+                                color:var(--muted);
+                                font-size:12px;">
+                            Standby
+                        </div>
+
+                    </div>
+
+                    <div class="card">
+
+                        <div class="card-icon">♫</div>
+
+                        <h3>Quantum Voice</h3>
+
+                        <p>
+                            Select a browser-installed voice for
+                            spoken AI responses.
+                        </p>
+
+                        <select
+                            id="voiceSelect"
+                            style="margin-top:15px;">
+                        </select>
+
+                        <button
+                            class="btn"
+                            id="testVoice"
+                            style="margin-top:10px;">
+                            Test Voice
+                        </button>
+
+                    </div>
+
+                    <div class="card">
+
+                        <div class="card-icon">⌁</div>
+
+                        <h3>Wake Word</h3>
+
+                        <p>
+                            Browser wake-word support can be implemented
+                            through continuous speech recognition.
+                        </p>
+
+                        <div
+                            class="setting"
+                            style="margin-top:10px;">
+                            <div class="setting-info">
+                                <strong>Hey Quantum</strong>
+                                <span>Wake word listener</span>
+                            </div>
+
+                            <label class="toggle">
+                                <input
+                                    type="checkbox"
+                                    id="wakeWord">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- =================================================
+                 SETTINGS
+                 ================================================= -->
+
+            <section class="view" id="view-settings">
+
+                <div class="page-header">
+                    <h2>System Settings</h2>
+                    <p>
+                        Customize the Quantum interface.
+                    </p>
+                </div>
+
+                <div class="card" style="width:min(800px,100%);margin:auto;">
+
+                    <div class="setting">
+
+                        <div class="setting-info">
+                            <strong>Theme</strong>
+                            <span>Switch between dark and light interface.</span>
+                        </div>
+
+                        <select id="themeSelect">
+                            <option value="dark">Dark</option>
+                            <option value="light">Light</option>
+                        </select>
+
+                    </div>
+
+                    <div class="setting">
+
+                        <div class="setting-info">
+                            <strong>Accent Colour</strong>
+                            <span>Customize Quantum's energy colour.</span>
+                        </div>
+
+                        <input
+                            id="accentPicker"
+                            type="color"
+                            value="#00eaff">
+
+                    </div>
+
+                    <div class="setting">
+
+                        <div class="setting-info">
+                            <strong>Font Size</strong>
+                            <span>Adjust application text size.</span>
+                        </div>
+
+                        <select id="fontSize">
+                            <option value="14px">Normal</option>
+                            <option value="15px">Large</option>
+                            <option value="16px">Extra Large</option>
+                        </select>
+
+                    </div>
+
+                    <div class="setting">
+
+                        <div class="setting-info">
+                            <strong>Animations</strong>
+                            <span>Disable animations for accessibility.</span>
+                        </div>
+
+                        <label class="toggle">
+                            <input
+                                id="animationsToggle"
+                                type="checkbox"
+                                checked>
+                            <span class="slider"></span>
+                        </label>
+
+                    </div>
+
+                    <div class="setting">
+
+                        <div class="setting-info">
+                            <strong>API Provider</strong>
+                            <span>
+                                Front-end selector for your AI backend.
+                            </span>
+                        </div>
+
+                        <select id="provider">
+                            <option>Demo Mode</option>
+                            <option>OpenAI</option>
+                            <option>Google Gemini</option>
+                            <option>Anthropic Claude</option>
+                            <option>Groq</option>
+                            <option>OpenRouter</option>
+                            <option>Ollama</option>
+                        </select>
+
+                    </div>
+
+                    <div class="setting">
+
+                        <div class="setting-info">
+                            <strong>API Key</strong>
+                            <span>
+                                Sent to your own <code>/api/chat</code> backend only —
+                                this page never calls the AI provider directly.
+                                Set up a small server that forwards this key
+                                to enable real replies.
+                            </span>
+                        </div>
+
+                        <input
+                            id="apiKey"
+                            type="password"
+                            placeholder="Paste your provider API key">
+
+                    </div>
+
+                    <div
+                        style="
+                            display:flex;
+                            gap:8px;
+                            margin-top:20px;
+                            flex-wrap:wrap;">
+
+                        <button
+                            class="btn primary"
+                            id="saveSettings">
+                            Save Settings
+                        </button>
+
+                        <button
+                            class="btn"
+                            id="exportSettings">
+                            Export Settings
+                        </button>
+
+                        <button
+                            class="btn"
+                            id="importSettings">
+                            Import Settings
+                        </button>
+
+                        <input
+                            id="settingsFile"
+                            type="file"
+                            accept=".json"
+                            hidden>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- =================================================
+                 ABOUT
+                 ================================================= -->
+
+            <section class="view" id="view-about">
+
+                <div class="page-header">
+                    <h2>Quantum Bot</h2>
+                    <p>
+                        An experimental futuristic AI interface.
+                    </p>
+                </div>
+
+                <div class="card-grid">
+
+                    <div class="card">
+                        <div class="card-icon">Q</div>
+                        <h3>Quantum Core</h3>
+                        <p>
+                            Designed around a modular AI architecture
+                            that can connect to different model providers.
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon">⌘</div>
+                        <h3>Privacy First Architecture</h3>
+                        <p>
+                            Production deployments should keep credentials,
+                            authentication and provider calls on a secure
+                            backend.
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon">∞</div>
+                        <h3>Provider Agnostic</h3>
+                        <p>
+                            The application can be connected to OpenAI,
+                            Gemini, Claude, Groq, OpenRouter or local Ollama.
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-icon">⚡</div>
+                        <h3>Vanilla Performance</h3>
+                        <p>
+                            The visual system uses CSS animations,
+                            Canvas particles and native browser APIs
+                            without requiring a large framework.
+                        </p>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </section>
+
+    </main>
+
+</div>
+
+<!-- TOAST -->
+
+<div class="toast" id="toast"></div>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+
+<script>
+"use strict";
+
+/* ============================================================
+   QUANTUM BOT — APPLICATION CORE
+   ============================================================ */
+
+const Quantum = (() => {
+
+    /* ----------------------------------------------------------
+       STATE
+       ---------------------------------------------------------- */
+
+    const state = {
+        chats: [],
+        currentChat: [],
+        currentChatId: null,
+
+        provider: "Demo Mode",
+
+        user: null,
+
+        settings: {
+            theme: "dark",
+            accent: "#00eaff",
+            fontSize: "14px",
+            animations: true,
+            apiKey: ""
+        },
+
+        recognition: null,
+        listening: false,
+        voices: []
+    };
+
+    /* ----------------------------------------------------------
+       DOM HELPERS
+       ---------------------------------------------------------- */
+
+    const $ = selector => document.querySelector(selector);
+
+    const $$ = selector =>
+        [...document.querySelectorAll(selector)];
+
+    /* ----------------------------------------------------------
+       STORAGE
+       ---------------------------------------------------------- */
+
+    function loadState() {
+
+        try {
+
+            const savedChats =
+                localStorage.getItem("quantum_chats");
+
+            const savedSettings =
+                localStorage.getItem("quantum_settings");
+
+            const savedUser =
+                localStorage.getItem("quantum_user");
+
+            if (savedChats) {
+                state.chats = JSON.parse(savedChats);
+            }
+
+            if (savedSettings) {
+                state.settings = {
+                    ...state.settings,
+                    ...JSON.parse(savedSettings)
+                };
+            }
+
+            if (savedUser) {
+                state.user = JSON.parse(savedUser);
+            }
+
+        } catch (error) {
+            console.warn("Local storage unavailable.", error);
+        }
+
+        applySettings();
+    }
+
+    function saveState() {
+
+        localStorage.setItem(
+            "quantum_chats",
+            JSON.stringify(state.chats)
+        );
+
+        localStorage.setItem(
+            "quantum_settings",
+            JSON.stringify(state.settings)
+        );
+
+        if (state.user) {
+
+            localStorage.setItem(
+                "quantum_user",
+                JSON.stringify(state.user)
+            );
+
+        } else {
+
+            localStorage.removeItem("quantum_user");
+
+        }
+    }
+
+    /* ----------------------------------------------------------
+       SETTINGS
+       ---------------------------------------------------------- */
+
+    function applySettings() {
+
+        document.body.classList.toggle(
+            "light",
+            state.settings.theme === "light"
+        );
+
+        document.body.classList.toggle(
+            "reduce-motion",
+            !state.settings.animations
+        );
+
+        document.documentElement.style.setProperty(
+            "--accent",
+            state.settings.accent
+        );
+
+        document.documentElement.style.setProperty(
+            "--accent2",
+            state.settings.accent
+        );
+
+        document.documentElement.style.fontSize =
+            state.settings.fontSize;
+
+        const themeSelect = $("#themeSelect");
+
+        if (themeSelect) {
+            themeSelect.value = state.settings.theme;
+        }
+
+        const picker = $("#accentPicker");
+
+        if (picker) {
+            picker.value = state.settings.accent;
+        }
+
+        const font = $("#fontSize");
+
+        if (font) {
+            font.value = state.settings.fontSize;
+        }
+
+        const animation = $("#animationsToggle");
+
+        if (animation) {
+            animation.checked = state.settings.animations;
+        }
+
+        const provider = $("#provider");
+
+        if (provider && state.provider) {
+            provider.value = state.provider;
+        }
+
+        const key = $("#apiKey");
+
+        if (key) {
+            key.value = state.settings.apiKey || "";
+        }
+    }
+
+    function setupSettings() {
+
+        $("#themeSelect").addEventListener("change", e => {
+
+            state.settings.theme = e.target.value;
+
+            applySettings();
+            saveState();
+
+        });
+
+        $("#accentPicker").addEventListener("input", e => {
+
+            state.settings.accent = e.target.value;
+
+            applySettings();
+
+        });
+
+        $("#fontSize").addEventListener("change", e => {
+
+            state.settings.fontSize = e.target.value;
+
+            applySettings();
+
+        });
+
+        $("#animationsToggle").addEventListener("change", e => {
+
+            state.settings.animations = e.target.checked;
+
+            applySettings();
+
+        });
+
+        $("#provider").addEventListener("change", e => {
+            state.provider = e.target.value;
+        });
+
+        $("#apiKey").addEventListener("input", e => {
+            state.settings.apiKey = e.target.value;
+        });
+
+        $("#saveSettings").addEventListener("click", () => {
+
+            saveState();
+
+            toast("Quantum settings saved.");
+
+        });
+
+        $("#exportSettings").addEventListener(
+            "click",
+            exportSettings
+        );
+
+        $("#importSettings").addEventListener(
+            "click",
+            () => $("#settingsFile").click()
+        );
+
+        $("#settingsFile").addEventListener(
+            "change",
+            importSettings
+        );
+    }
+
+    function exportSettings() {
+
+        const data = JSON.stringify(
+            state.settings,
+            null,
+            2
+        );
+
+        downloadFile(
+            data,
+            "quantum-settings.json",
+            "application/json"
+        );
+
+        toast("Settings exported.");
+    }
+
+    function importSettings(event) {
+
+        const file = event.target.files[0];
+
+        if (!file) return;
+
+        const reader = new FileReader();
+
+        reader.onload = () => {
+
+            try {
+
+                state.settings = {
+                    ...state.settings,
+                    ...JSON.parse(reader.result)
+                };
+
+                applySettings();
+                saveState();
+
+                toast("Settings imported.");
+
+            } catch {
+                toast("Invalid settings file.");
+            }
+
+        };
+
+        reader.readAsText(file);
+    }
+
+    /* ----------------------------------------------------------
+       AUTH — LOGIN / SIGNUP / GOOGLE SIGN-IN
+       ---------------------------------------------------------- */
+
+    /*
+     * Replace with your own OAuth Client ID from
+     * https://console.cloud.google.com/apis/credentials
+     * (a Client ID must be registered to the domain this
+     * file is served from before Google Sign-In will work).
+     */
+    const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
+
+    let signupMode = false;
+
+    function usersDB() {
+
+        try {
+
+            return JSON.parse(
+                localStorage.getItem("quantum_users") || "{}"
+            );
+
+        } catch {
+            return {};
+        }
+    }
+
+    function saveUsersDB(db) {
+
+        localStorage.setItem(
+            "quantum_users",
+            JSON.stringify(db)
+        );
+    }
+
+    /*
+     * Demo-only credential hashing. This runs entirely in the
+     * browser with no server, so it cannot provide real security —
+     * a production app must verify credentials server-side.
+     */
+    async function hashPassword(password) {
+
+        const data =
+            new TextEncoder().encode(password);
+
+        const digest =
+            await crypto.subtle.digest("SHA-256", data);
+
+        return [...new Uint8Array(digest)]
+            .map(b => b.toString(16).padStart(2, "0"))
+            .join("");
+    }
+
+    function setupAuth() {
+
+        const form = $("#loginForm");
+        const errorBox = $("#loginError");
+        const switchBtn = $("#loginSwitchBtn");
+        const switchLabel = $("#loginSwitchLabel");
+        const submitText = $("#loginSubmitText");
+        const guestBtn = $("#guestBtn");
+
+        function showError(message) {
+
+            errorBox.textContent = message;
+            errorBox.classList.add("show");
+
+        }
+
+        function clearError() {
+
+            errorBox.classList.remove("show");
+
+        }
+
+        switchBtn.addEventListener("click", () => {
+
+            signupMode = !signupMode;
+
+            submitText.textContent =
+                signupMode ? "Create Account" : "Sign In";
+
+            switchLabel.textContent =
+                signupMode
+                    ? "Already have an account?"
+                    : "Don't have an account?";
+
+            switchBtn.textContent =
+                signupMode ? "Sign in" : "Create one";
+
+            clearError();
+
+        });
+
+        form.addEventListener("submit", async event => {
+
+            event.preventDefault();
+
+            clearError();
+
+            const email =
+                $("#loginEmail").value.trim().toLowerCase();
+
+            const password =
+                $("#loginPassword").value;
+
+            if (!email || password.length < 6) {
+
+                showError(
+                    "Enter a valid email and a password of at least 6 characters."
+                );
+
+                return;
+
+            }
+
+            const db = usersDB();
+            const passwordHash = await hashPassword(password);
+
+            if (signupMode) {
+
+                if (db[email]) {
+
+                    showError(
+                        "An account with that email already exists."
+                    );
+
+                    return;
+
+                }
+
+                db[email] = {
+                    passwordHash,
+                    name: email.split("@")[0]
+                };
+
+                saveUsersDB(db);
+
+                signInAs({
+                    email,
+                    name: db[email].name,
+                    picture: null,
+                    provider: "password"
+                });
+
+            } else {
+
+                const record = db[email];
+
+                if (!record || record.passwordHash !== passwordHash) {
+
+                    showError(
+                        "Incorrect email or password."
+                    );
+
+                    return;
+
+                }
+
+                signInAs({
+                    email,
+                    name: record.name,
+                    picture: null,
+                    provider: "password"
+                });
+
+            }
+
+        });
+
+        guestBtn.addEventListener("click", () => {
+
+            signInAs({
+                email: "",
+                name: "Guest",
+                picture: null,
+                provider: "guest"
+            });
+
+        });
+
+        setupGoogleSignIn();
+
+    }
+
+    function setupGoogleSignIn() {
+
+        if (
+            !window.google ||
+            !google.accounts ||
+            GOOGLE_CLIENT_ID.startsWith("YOUR_GOOGLE_CLIENT_ID")
+        ) {
+
+            /*
+             * Google Identity Services script isn't loaded, or
+             * no real Client ID has been configured yet — hide
+             * the button rather than show one that can't work.
+             */
+
+            const btn = $("#googleSignInBtn");
+            const divider = $(".login-divider");
+
+            if (btn) btn.style.display = "none";
+            if (divider) divider.style.display = "none";
+
+            return;
+
+        }
+
+        google.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: handleGoogleCredential
+        });
+
+        google.accounts.id.renderButton(
+            $("#googleSignInBtn"),
+            {
+                theme: "filled_black",
+                shape: "pill",
+                size: "large",
+                text: "continue_with"
+            }
+        );
+    }
+
+    function handleGoogleCredential(response) {
+
+        try {
+
+            const payload =
+                JSON.parse(
+                    atob(
+                        response.credential
+                            .split(".")[1]
+                            .replace(/-/g, "+")
+                            .replace(/_/g, "/")
+                    )
+                );
+
+            signInAs({
+                email: payload.email || "",
+                name: payload.name || payload.email || "Google User",
+                picture: payload.picture || null,
+                provider: "google",
+                googleToken: response.credential
+            });
+
+        } catch (error) {
+
+            console.warn("Google credential parse failed.", error);
+
+            toast("Google sign-in failed. Please try again.");
+
+        }
+    }
+
+    function signInAs(user) {
+
+        state.user = user;
+
+        saveState();
+
+        updateProfileUI();
+
+        $("#login").classList.add("hide");
+
+        $("#app").classList.add("ready");
+
+        startParticles();
+
+        toast(`Signed in as ${user.name}.`);
+
+    }
+
+    function signOut() {
+
+        state.user = null;
+
+        saveState();
+
+        $("#app").classList.remove("ready");
+
+        $("#loginEmail").value = "";
+        $("#loginPassword").value = "";
+
+        $("#login").classList.remove("hide");
+
+    }
+
+    function showLogin() {
+
+        updateProfileUI();
+
+        $("#login").classList.remove("hide");
+
+    }
+
+    function updateProfileUI() {
+
+        const avatar = $("#sidebarAvatar");
+        const nameEl = $("#sidebarName");
+        const subEl = $("#sidebarSub");
+
+        if (!avatar || !nameEl || !subEl) return;
+
+        if (state.user) {
+
+            nameEl.textContent = state.user.name || "Quantum User";
+            subEl.textContent =
+                state.user.provider === "google"
+                    ? "Signed in with Google"
+                    : state.user.provider === "guest"
+                        ? "Guest session"
+                        : "Neural access enabled";
+
+            if (state.user.picture) {
+
+                avatar.innerHTML =
+                    `<img src="${state.user.picture}" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+
+            } else {
+
+                avatar.textContent =
+                    (state.user.name || "Q").trim()[0].toUpperCase();
+
+            }
+
+        } else {
+
+            nameEl.textContent = "Quantum User";
+            subEl.textContent = "Neural access enabled";
+            avatar.textContent = "Q";
+
+        }
+    }
+
+    /* ----------------------------------------------------------
+       INTRO
+       ---------------------------------------------------------- */
+
+    async function intro() {
+
+        const intro = $("#intro");
+        const atom = $("#introAtom");
+        const title = $("#typedIntro");
+
+        /*
+         * Stage 1: protons and neutrons fly in and
+         * bind together into the nucleus.
+         */
+
+        await wait(400);
+
+        atom.classList.add("nucleons-in");
+
+        await wait(1100);
+
+        /*
+         * Stage 2: electron shells fade in and begin
+         * revolving around the freshly-formed nucleus.
+         */
+
+        atom.classList.add("electrons-in");
+
+        await wait(1200);
+
+        /*
+         * Stage 3: "QUANTUM BOT" types out beneath
+         * the completed atom.
+         */
+
+        const text = "QUANTUM BOT";
+
+        for (const char of text) {
+
+            title.textContent += char;
+
+            await wait(85);
+
+        }
+
+        await wait(1000);
+
+        /*
+         * Stage 4: the whole atom breaks apart —
+         * nucleons scatter, electron shells fly outward.
+         */
+
+        atom.classList.add("breaking");
+
+        await wait(800);
+
+        intro.classList.add("hide");
+
+        enterMainMenu();
+
+    }
+
+    function enterMainMenu() {
+
+        if (state.user) {
+
+            $("#app").classList.add("ready");
+
+            startParticles();
+
+        } else {
+
+            showLogin();
+
+        }
+    }
+
+    /* ----------------------------------------------------------
+       NAVIGATION
+       ---------------------------------------------------------- */
+
+    function setupNavigation() {
+
+        $$(".nav button[data-view]").forEach(button => {
+
+            button.addEventListener("click", () => {
+
+                const view = button.dataset.view;
+
+                switchView(view);
+
+                $("#sidebar").classList.remove("open");
+
+            });
+
+        });
+
+        $("#themeQuick").addEventListener("click", () => {
+
+            state.settings.theme =
+                state.settings.theme === "dark"
+                    ? "light"
+                    : "dark";
+
+            applySettings();
+            saveState();
+
+        });
+
+        $("#mobileMenu").addEventListener("click", () => {
+
+            $("#sidebar").classList.toggle("open");
+
+        });
+
+    }
+
+    function switchView(name) {
+
+        $$(".view").forEach(view => {
+            view.classList.remove("active");
+        });
+
+        $(`#view-${name}`).classList.add("active");
+
+        $$(".nav button[data-view]").forEach(button => {
+
+            button.classList.toggle(
+                "active",
+                button.dataset.view === name
+            );
+
+        });
+
+        if (name === "history") {
+            renderHistory();
+        }
+    }
+
+    /* ----------------------------------------------------------
+       CHAT
+       ---------------------------------------------------------- */
+
+    function createChat() {
+
+        const chat = {
+            id: crypto.randomUUID
+                ? crypto.randomUUID()
+                : Date.now().toString(),
+
+            title: "New Quantum Chat",
+
+            created:
+                new Date().toISOString(),
+
+            messages: []
+        };
+
+        state.chats.unshift(chat);
+
+        state.currentChatId = chat.id;
+        state.currentChat = chat.messages;
+
+        saveState();
+
+        return chat;
+    }
+
+    function getCurrentChat() {
+
+        if (!state.currentChatId) {
+            return createChat();
+        }
+
+        return state.chats.find(
+            chat => chat.id === state.currentChatId
+        );
+    }
+
+    function newChat() {
+
+        state.currentChatId = null;
+        state.currentChat = [];
+
+        $("#messages").innerHTML = "";
+
+        $("#messages").appendChild(
+            welcomeElement()
+        );
+
+        switchView("chat");
+
+        createChat();
+
+        toast("New quantum session initialized.");
+    }
+
+    function welcomeElement() {
+
+        const wrapper =
+            document.createElement("div");
+
+        wrapper.className = "welcome";
+
+        wrapper.innerHTML = `
+            <div class="welcome-orb"></div>
+
+            <h1>
+                Meet
+                <span class="gradient-text">
+                    Quantum
+                </span>
+            </h1>
+
+            <p>
+                Your quantum interface is ready.
+                Ask a question, write code, explore ideas,
+                analyze images or use your voice.
+            </p>
+        `;
+
+        return wrapper;
+    }
+
+    function setupChat() {
+
+        $("#newChat").addEventListener(
+            "click",
+            newChat
+        );
+
+        document.addEventListener("focusin", keepComposerVisible);
+
+        $("#sendButton").addEventListener(
+            "click",
+            sendMessage
+        );
+
+        $("#prompt").addEventListener(
+            "keydown",
+            event => {
+
+                if (
+                    event.key === "Enter" &&
+                    !event.shiftKey
+                ) {
+
+                    event.preventDefault();
+
+                    sendMessage();
+
+                }
+
+            }
+        );
+
+        $("#prompt").addEventListener(
+            "input",
+            autoResize
+        );
+
+        $("#prompt").addEventListener(
+            "focus",
+            () => setTimeout(scrollMessages, 50)
+        );
+
+        $$(".suggestion").forEach(button => {
+
+            button.addEventListener("click", () => {
+
+                $("#prompt").value =
+                    button.dataset.prompt;
+
+                sendMessage();
+
+            });
+
+        });
+
+        $("#clearChat").addEventListener(
+            "click",
+            clearConversation
+        );
+
+        $("#exportChat").addEventListener(
+            "click",
+            exportConversation
+        );
+    }
+
+    function autoResize() {
+
+        const input = $("#prompt");
+
+        input.style.height = "auto";
+
+        input.style.height =
+            Math.min(input.scrollHeight, 150) + "px";
+    }
+
+    function keepComposerVisible() {
+
+        const active =
+            document.activeElement;
+
+        if (
+            active &&
+            (
+                active.id === "prompt" ||
+                active.id === "imagePrompt" ||
+                active.tagName === "INPUT" ||
+                active.tagName === "TEXTAREA"
+            )
+        ) {
+            scrollMessages();
+        }
+    }
+
+    async function sendMessage() {
+
+        const input = $("#prompt");
+
+        const text = input.value.trim();
+
+        if (!text) return;
+
+        input.value = "";
+
+        autoResize();
+
+        const chat = getCurrentChat();
+
+        if (chat.messages.length === 0) {
+
+            chat.title =
+                text.slice(0, 55) +
+                (text.length > 55 ? "…" : "");
+
+        }
+
+        addMessage("user", text);
+
+        chat.messages.push({
+            role: "user",
+            content: text,
+            timestamp: new Date().toISOString()
+        });
+
+        saveState();
+
+        const typing =
+            addTypingMessage();
+
+        try {
+
+            const answer =
+                await AI.chat(
+                    chat.messages
+                );
+
+            typing.remove();
+
+            await streamAssistant(answer);
+
+            chat.messages.push({
+                role: "assistant",
+                content: answer,
+                timestamp: new Date().toISOString()
+            });
+
+            saveState();
+
+        } catch (error) {
+
+            typing.remove();
+
+            addMessage(
+                "assistant",
+                "Quantum Core error: " +
+                escapeHTML(error.message)
+            );
+
+        }
+    }
+
+    function addMessage(role, content) {
+
+        const container = $("#messages");
+
+        const welcome =
+            container.querySelector(".welcome");
+
+        if (welcome) {
+            welcome.remove();
+        }
+
+        const message =
+            document.createElement("article");
+
+        message.className =
+            `message ${role}`;
+
+        const time =
+            new Date().toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+
+        message.innerHTML = `
+            <div class="message-avatar">
+                ${role === "user" ? "U" : "Q"}
+            </div>
+
+            <div class="message-body">
+
+                <div class="message-meta">
+                    ${role === "user"
+                        ? "You"
+                        : "Quantum Bot"}
+                    <span>•</span>
+                    ${time}
+                </div>
+
+                <div class="bubble">
+                    ${renderMarkdown(content)}
+                </div>
+
+            </div>
+        `;
+
+        container.appendChild(message);
+
+        attachCopyButtons(message);
+
+        scrollMessages();
+
+        return message;
+    }
+
+    function addTypingMessage() {
+
+        const container = $("#messages");
+
+        const message =
+            document.createElement("article");
+
+        message.className =
+            "message assistant";
+
+        message.innerHTML = `
+            <div class="message-avatar">Q</div>
+
+            <div class="message-body">
+
+                <div class="message-meta">
+                    Quantum Bot
+                </div>
+
+                <div class="bubble">
+
+                    <div class="typing">
+                        <i></i>
+                        <i></i>
+                        <i></i>
+                    </div>
+
+                </div>
+
+            </div>
+        `;
+
+        container.appendChild(message);
+
+        scrollMessages();
+
+        return message;
+    }
+
+    async function streamAssistant(text) {
+
+        const message =
+            document.createElement("article");
+
+        message.className =
+            "message assistant";
+
+        const time =
+            new Date().toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+
+        message.innerHTML = `
+            <div class="message-avatar">Q</div>
+
+            <div class="message-body">
+
+                <div class="message-meta">
+                    Quantum Bot
+                    <span>•</span>
+                    ${time}
+                </div>
+
+                <div class="bubble"></div>
+
+            </div>
+        `;
+
+        $("#messages").appendChild(message);
+
+        const bubble =
+            message.querySelector(".bubble");
+
+        let current = "";
+
+        for (const char of text) {
+
+            current += char;
+
+            bubble.innerHTML =
+                renderMarkdown(current);
+
+            scrollMessages();
+
+            await wait(
+                state.settings.animations
+                    ? 8
+                    : 0
+            );
+
+        }
+
+        attachCopyButtons(message);
+
+        speakIfEnabled(text);
+    }
+
+    function scrollMessages() {
+
+        const container = $("#messages");
+
+        requestAnimationFrame(() => {
+
+            container.scrollTo({
+                top: container.scrollHeight,
+                behavior: state.settings.animations
+                    ? "smooth"
+                    : "auto"
+            });
+
+        });
+    }
+
+    /* ----------------------------------------------------------
+       MARKDOWN RENDERER
+       Lightweight safe renderer.
+       ---------------------------------------------------------- */
+
+    function renderMarkdown(text) {
+
+        let safe = escapeHTML(text);
+
+        const codeBlocks = [];
+
+        safe = safe.replace(
+            /```(\w*)\n?([\s\S]*?)```/g,
+            (_, language, code) => {
+
+                const index =
+                    codeBlocks.push({
+                        language:
+                            language || "code",
+                        code
+                    }) - 1;
+
+                return `___CODE_${index}___`;
+            }
+        );
+
+        safe = safe.replace(
+            /\*\*(.*?)\*\*/g,
+            "<strong>$1</strong>"
+        );
+
+        safe = safe.replace(
+            /`([^`]+)`/g,
+            "<code>$1</code>"
+        );
+
+        safe = safe.replace(
+            /^### (.*)$/gm,
+            "<h3>$1</h3>"
+        );
+
+        safe = safe.replace(
+            /^## (.*)$/gm,
+            "<h3>$1</h3>"
+        );
+
+        safe = safe.replace(
+            /^# (.*)$/gm,
+            "<h3>$1</h3>"
+        );
+
+        safe = safe.replace(
+            /\n/g,
+            "<br>"
+        );
+
+        codeBlocks.forEach((block, index) => {
+
+            const html = `
+                <div class="code-wrap">
+
+                    <div class="code-head">
+
+                        <span>
+                            ${escapeHTML(block.language)}
+                        </span>
+
+                        <button
+                            class="copy-code"
+                            data-code="${encodeURIComponent(block.code)}">
+                            Copy
+                        </button>
+
+                    </div>
+
+                    <pre><code>${block.code}</code></pre>
+
+                </div>
+            `;
+
+            safe =
+                safe.replace(
+                    `___CODE_${index}___`,
+                    html
+                );
+
+        });
+
+        return safe;
+    }
+
+    function attachCopyButtons(root) {
+
+        root.querySelectorAll(
+            ".copy-code"
+        ).forEach(button => {
+
+            button.addEventListener(
+                "click",
+                async () => {
+
+                    const code =
+                        decodeURIComponent(
+                            button.dataset.code
+                        );
+
+                    await navigator.clipboard.writeText(code);
+
+                    button.textContent = "Copied";
+
+                    setTimeout(() => {
+                        button.textContent = "Copy";
+                    }, 1200);
+
+                }
+            );
+
+        });
+    }
+
+    function escapeHTML(value) {
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    /* ----------------------------------------------------------
+       AI PROVIDER ADAPTER
+       ----------------------------------------------------------
+
+       Production architecture:
+
+       Browser
+           ↓
+       /api/chat
+           ↓
+       Node/Express
+           ↓
+       Provider API
+
+       Never expose real API secrets in this file.
+       ---------------------------------------------------------- */
+
+    const AI = {
+
+        async chat(messages) {
+
+            /*
+             * Production:
+             *
+             * const response = await fetch("http://localhost:8080/api/chat", {
+             *     method: "POST",
+             *     headers: {
+             *         "Content-Type": "application/json"
+             *     },
+             *     body: JSON.stringify({
+             *         provider: state.provider,
+             *         messages
+             *     })
+             * });
+             *
+             * if (!response.ok) {
+             *     throw new Error("AI request failed");
+             * }
+             *
+             * const data = await response.json();
+             * return data.message;
+             */
+
+            try {
+
+                if (state.provider !== "Demo Mode") {
+
+                    const response =
+                        await fetch("http://localhost:8080/api/chat", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                provider: state.provider,
+                                apiKey: state.settings.apiKey || "",
+                                messages
+                            })
+                        });
+
+                    if (response.ok) {
+
+                        const data = await response.json();
+
+                        if (data && typeof data.message === "string" && data.message.trim()) {
+                            return data.message.trim();
+                        }
+
+                    } else if (response.status !== 404) {
+
+                        /*
+                         * A backend exists but returned an error
+                         * (bad key, rate limit, etc). Surface that
+                         * instead of silently falling back to demo
+                         * mode, so the user knows their key/backend
+                         * needs attention.
+                         */
+
+                        let detail = "";
+
+                        try {
+                            const errorData = await response.json();
+                            detail = errorData?.error || "";
+                        } catch {}
+
+                        throw new Error(
+                            detail ||
+                            `Backend returned ${response.status}.`
+                        );
+
+                    }
+
+                }
+
+            } catch (error) {
+
+                if (state.provider !== "Demo Mode") {
+
+                    console.warn(
+                        "Live AI backend unavailable, using local demo reply.",
+                        error
+                    );
+
+                    toast(
+                        "Live AI backend not reachable — showing a demo reply. " +
+                        "Connect /api/chat on your server to enable " +
+                        state.provider + "."
+                    );
+
+                }
+
+            }
+
+            return demoAI(messages);
+        }
+
+    };
+
+    async function demoAI(messages) {
+
+        await wait(
+            state.settings.animations
+                ? 450
+                : 60
+        );
+
+        const latest =
+            messages[messages.length - 1]?.content
+            || "";
+
+        return buildDemoReply(latest, messages);
+    }
+
+    function buildDemoReply(latest, messages) {
+
+        const text = String(latest || "").trim();
+        const lower = text.toLowerCase();
+
+        if (!text) {
+            return "Quantum Core is online. Ask me anything.";
+        }
+
+        const mathValue = solveMathQuestion(text);
+
+        if (mathValue !== null) {
+            return `The answer is **${mathValue}**.`;
+        }
+
+        if (/\b(hi|hello|hey|yo)\b/.test(lower)) {
+            return `**Quantum Core online.** Hey — what’s up? Ask me anything.`;
+        }
+
+        if (/\b(who are you|what are you|introduce yourself)\b/.test(lower)) {
+            return `I’m **Quantum Bot** — a futuristic chat interface. Right now I’m in local demo mode; connect a backend \`/api/chat\` endpoint for full model replies.`;
+        }
+
+        if (/\b(code|javascript|html|css|python|programming|debug|bug|fix)\b/.test(lower)) {
+            return `
+That sounds like a coding task. Here’s a clean starting point:
+
+\`\`\`javascript
+function quantumReply(message) {
+    return "Got it: " + message;
+}
+\`\`\`
+
+Tell me the exact problem and I’ll tailor the code.
+            `.trim();
+        }
+
+        if (/\b(image|picture|photo|vision|ocr|caption)\b/.test(lower)) {
+            return `
+I can help with image work through the **Quantum Image Lab**.
+Upload an image there and I can guide analysis, captioning, or OCR.
+            `.trim();
+        }
+
+        if (/\b(summary|summarize|shorten|explain|what is|how does|why does)\b/.test(lower)) {
+            return makeKnowledgeAnswer(text);
+        }
+
+        if (/\b(idea|ideas|brainstorm|plan|project)\b/.test(lower)) {
+            return `
+Here are some directions:
+
+${makeIdeaList(text)}
+
+Want me to turn any of these into a full step-by-step plan?
+            `.trim();
+        }
+
+        return makeBestEffortAnswer(text);
+    }
+
+    function solveMathQuestion(text) {
+
+        const cleaned = text
+            .replace(/[^0-9+\-*/().,%÷×^\s]/g, "")
+            .replace(/×/g, "*")
+            .replace(/÷/g, "/")
+            .replace(/,/g, "");
+
+        const match = cleaned.match(/[0-9][0-9+\-*/().\s]*[0-9)]/);
+
+        if (!match) return null;
+
+        const expression = match[0].trim();
+
+        if (!/^[0-9+\-*/().\s]+$/.test(expression)) {
+            return null;
+        }
+
+        try {
+
+            const result = Function(`"use strict"; return (${expression});`)();
+
+            if (typeof result === "number" && Number.isFinite(result)) {
+                return Number.isInteger(result) ? String(result) : String(Number(result.toFixed(6)));
+            }
+
+        } catch (error) {
+            return null;
+        }
+
+        return null;
+    }
+
+    function makeBestEffortAnswer(text) {
+
+        const cleaned = text.trim().replace(/\s+/g, " ");
+        const trimmed = cleaned.length > 160
+            ? cleaned.slice(0, 160) + "…"
+            : cleaned;
+
+        return `On “${escapeHTML(trimmed)}” — I’m ready to explain, write code, brainstorm, or help you fix it. Drop more detail and I’ll go deeper.`;
+    }
+
+    function makeKnowledgeAnswer(text) {
+
+        const normalized = text
+            .toLowerCase()
+            .replace(/[?!.]/g, "")
+            .trim();
+
+        const topic = normalized
+            .replace(/^(here is a clean response to your question:|please|can you|could you)\s*/i, "")
+            .trim();
+
+        const answers = [
+            [
+                /\bphysics\b/,
+                "Physics is the branch of science that studies matter, energy, motion, force, and how they interact. It explains things like gravity, electricity, light, heat, and motion."
+            ],
+            [
+                /\bquantum computing\b/,
+                "Quantum computing uses quantum bits, or qubits, which can behave differently from normal bits. It is useful for some specialised problems, but it is still an emerging technology."
+            ],
+            [
+                /\bjavascript\b/,
+                "JavaScript is a programming language used to make websites interactive. It can update content, handle clicks, run animations, and connect to APIs."
+            ],
+            [
+                /\bhtml\b/,
+                "HTML is the structure of a web page. It describes headings, paragraphs, buttons, images, and other elements."
+            ],
+            [
+                /\bcss\b/,
+                "CSS controls the style of a web page. It handles colours, layout, spacing, fonts, and responsive design."
+            ],
+            [
+                /\bartificial intelligence\b|\bai\b/,
+                "Artificial intelligence is software that performs tasks that normally need human intelligence, such as understanding language, recognising patterns, and making predictions."
+            ],
+            [
+                /\bmachine learning\b/,
+                "Machine learning is a part of AI where models learn patterns from data instead of being fully programmed with rules."
+            ],
+            [
+                /\bgravity\b/,
+                "Gravity is the force that pulls objects toward each other. On Earth, it keeps us on the ground and makes dropped objects fall."
+            ],
+            [
+                /\batom\b/,
+                "An atom is the basic unit of ordinary matter. It has a nucleus with protons and neutrons, and electrons around it."
+            ]
+        ];
+
+        for (const [pattern, answer] of answers) {
+            if (pattern.test(normalized)) {
+                return answer;
+            }
+        }
+
+        const match = topic.match(/^(what is|what are|define|explain|tell me about|how does|why does)\s+(.+)$/i);
+
+        if (match) {
+            const subject = match[2].replace(/\s+/g, " ").trim();
+
+            if (subject) {
+                const article =
+                    /^[aeiou]/i.test(subject)
+                        ? "an"
+                        : "a";
+
+                return `${subject.charAt(0).toUpperCase() + subject.slice(1)} is ${article} topic worth exploring. I can explain it simply, give an example, or break it into steps if you ask.`;
+            }
+        }
+
+        return makeBestEffortAnswer(text);
+    }
+
+    function makeIdeaList(text) {
+
+        const lowered = text.toLowerCase();
+
+        if (lowered.includes("game")) {
+            return `• Build the core gameplay loop
+• Add scoring and levels
+• Create a polished UI`;
+        }
+
+        if (lowered.includes("website") || lowered.includes("app")) {
+            return `• Design the main screens
+• Add working buttons and forms
+• Connect the data flow`;
+        }
+
+        if (lowered.includes("study")) {
+            return `• Break the topic into small parts
+• Practice daily
+• Review with short tests`;
+        }
+
+        return `• Start with the main goal
+• Split it into smaller steps
+• Build and test one piece at a time`;
+    }
+
+    /* ----------------------------------------------------------
+       HISTORY
+       ---------------------------------------------------------- */
+
+    function renderHistory(filter = "") {
+
+        const list = $("#historyList");
+
+        const normalized =
+            filter.toLowerCase();
+
+        const chats =
+            state.chats.filter(chat =>
+                chat.title
+                    .toLowerCase()
+                    .includes(normalized)
+            );
+
+        if (!chats.length) {
+
+            list.innerHTML = `
+                <div class="card">
+                    <p>No quantum conversations found.</p>
+                </div>
+            `;
+
+            return;
+        }
+
+        list.innerHTML = "";
+
+        chats.forEach(chat => {
+
+            const item =
+                document.createElement("div");
+
+            item.className =
+                "history-item";
+
+            item.innerHTML = `
+
+                <div class="message-avatar">
+                    Q
+                </div>
+
+                <div class="history-content">
+
+                    <div class="history-title">
+                        ${escapeHTML(chat.title)}
+                    </div>
+
+                    <div class="history-date">
+                        ${new Date(chat.created).toLocaleString()}
+                    </div>
+
+                </div>
+
+                <button
+                    class="delete-chat"
+                    title="Delete conversation">
+                    ✕
+                </button>
+            `;
+
+            item.addEventListener(
+                "click",
+                event => {
+
+                    if (
+                        event.target.closest(
+                            ".delete-chat"
+                        )
+                    ) return;
+
+                    loadChat(chat.id);
+
+                }
+            );
+
+            item.querySelector(
+                ".delete-chat"
+            ).addEventListener(
+                "click",
+                event => {
+
+                    event.stopPropagation();
+
+                    deleteChat(chat.id);
+
+                }
+            );
+
+            list.appendChild(item);
+
+        });
+    }
+
+    function loadChat(id) {
+
+        const chat =
+            state.chats.find(
+                item => item.id === id
+            );
+
+        if (!chat) return;
+
+        state.currentChatId = id;
+
+        $("#messages").innerHTML = "";
+
+        chat.messages.forEach(message => {
+
+            addMessage(
+                message.role,
+                message.content
+            );
+
+        });
+
+        switchView("chat");
+
+        toast("Quantum conversation restored.");
+    }
+
+    function deleteChat(id) {
+
+        state.chats =
+            state.chats.filter(
+                chat => chat.id !== id
+            );
+
+        if (state.currentChatId === id) {
+
+            state.currentChatId = null;
+            state.currentChat = [];
+
+            $("#messages").innerHTML = "";
+
+            $("#messages").appendChild(
+                welcomeElement()
+            );
+        }
+
+        saveState();
+
+        renderHistory();
+
+        toast("Conversation deleted.");
+    }
+
+    function clearConversation() {
+
+        const chat =
+            getCurrentChat();
+
+        chat.messages = [];
+
+        $("#messages").innerHTML = "";
+
+        $("#messages").appendChild(
+            welcomeElement()
+        );
+
+        saveState();
+
+        toast("Current quantum memory cleared.");
+    }
+
+    function exportConversation() {
+
+        const chat =
+            getCurrentChat();
+
+        const content =
+            chat.messages
+                .map(message =>
+                    `[${new Date(
+                        message.timestamp
+                    ).toLocaleString()}] ` +
+                    `${message.role.toUpperCase()}: ` +
+                    message.content
+                )
+                .join("\n\n");
+
+        downloadFile(
+            content,
+            "quantum-conversation.txt",
+            "text/plain"
+        );
+
+        toast("Conversation exported.");
+    }
+
+    /* ----------------------------------------------------------
+       IMAGE SYSTEM
+       ---------------------------------------------------------- */
+
+    function setupImages() {
+
+        const input =
+            $("#imageInput");
+
+        const dropzone =
+            $("#dropzone");
+
+        input.addEventListener(
+            "change",
+            event => {
+
+                const file =
+                    event.target.files[0];
+
+                if (file) {
+                    loadImage(file);
+                }
+
+            }
+        );
+
+        dropzone.addEventListener(
+            "click",
+            () => input.click()
+        );
+
+        [
+            "dragenter",
+            "dragover"
+        ].forEach(eventName => {
+
+            dropzone.addEventListener(
+                eventName,
+                event => {
+
+                    event.preventDefault();
+
+                    dropzone.classList.add(
+                        "dragging"
+                    );
+
+                }
+            );
+
+        });
+
+        [
+            "dragleave",
+            "drop"
+        ].forEach(eventName => {
+
+            dropzone.addEventListener(
+                eventName,
+                event => {
+
+                    event.preventDefault();
+
+                    dropzone.classList.remove(
+                        "dragging"
+                    );
+
+                }
+            );
+
+        });
+
+        dropzone.addEventListener(
+            "drop",
+            event => {
+
+                const file =
+                    event.dataTransfer.files[0];
+
+                if (file) {
+                    loadImage(file);
+                }
+
+            }
+        );
+
+        $("#analyzeImage").addEventListener(
+            "click",
+            () => imageAction("analysis")
+        );
+
+        $("#captionImage").addEventListener(
+            "click",
+            () => imageAction("caption")
+        );
+
+        $("#ocrImage").addEventListener(
+            "click",
+            () => imageAction("ocr")
+        );
+
+        $("#generateImage").addEventListener(
+            "click",
+            generateImage
+        );
+    }
+
+    let uploadedImage = null;
+
+    function loadImage(file) {
+
+        if (!file.type.startsWith("image/")) {
+
+            toast("Please select a valid image.");
+
+            return;
+        }
+
+        uploadedImage = file;
+
+        const reader =
+            new FileReader();
+
+        reader.onload = event => {
+
+            const preview =
+                $("#imagePreview");
+
+            preview.src =
+                event.target.result;
+
+            preview.style.display =
+                "block";
+
+            toast("Image loaded into Quantum Lab.");
+
+        };
+
+        reader.readAsDataURL(file);
+    }
+
+    function imageAction(type) {
+
+        if (!uploadedImage) {
+
+            toast("Upload an image first.");
+
+            return;
+        }
+
+        const messages = {
+            analysis:
+                "Image analysis endpoint ready. Connect /api/vision for object and diagram analysis.",
+
+            caption:
+                "Caption endpoint ready. Connect /api/vision for AI-generated captions.",
+
+            ocr:
+                "OCR endpoint ready. Connect /api/vision or a dedicated OCR service."
+        };
+
+        toast(messages[type]);
+    }
+
+    async function generateImage() {
+
+        const prompt =
+            $("#imagePrompt").value.trim();
+
+        if (!prompt) {
+
+            toast("Describe the image first.");
+
+            return;
+        }
+
+        /*
+         * Production request:
+         *
+         * POST /api/images/generate
+         * {
+         *   prompt: "..."
+         * }
+         *
+         * The backend should call the chosen image provider
+         * and return a safe image URL/blob.
+         */
+
+        const result =
+            $("#generatedImage");
+
+        result.innerHTML = `
+            <div class="card"
+                 style="margin-top:10px;">
+                <strong>Generation endpoint ready</strong>
+                <p style="margin-top:7px;">
+                    Connect your secure backend to
+                    <code>/api/images/generate</code>
+                    to generate the requested image.
+                </p>
+            </div>
+        `;
+    }
+
+    /* ----------------------------------------------------------
+       VOICE
+       ---------------------------------------------------------- */
+
+    function setupVoice() {
+
+        const SpeechRecognition =
+            window.SpeechRecognition ||
+            window.webkitSpeechRecognition;
+
+        if (SpeechRecognition) {
+
+            state.recognition =
+                new SpeechRecognition();
+
+            state.recognition.continuous =
+                false;
+
+            state.recognition.interimResults =
+                true;
+
+            state.recognition.lang =
+                "en-US";
+
+            state.recognition.onstart = () => {
+
+                state.listening = true;
+
+                $("#voiceStatus").textContent =
+                    "Listening…";
+
+            };
+
+            state.recognition.onresult =
+                event => {
+
+                    let transcript = "";
+
+                    for (
+                        let i = event.resultIndex;
+                        i < event.results.length;
+                        i++
+                    ) {
+
+                        transcript +=
+                            event.results[i][0].transcript;
+
+                    }
+
+                    $("#prompt").value =
+                        transcript;
+
+                    autoResize();
+
+                };
+
+            state.recognition.onend = () => {
+
+                state.listening = false;
+
+                $("#voiceStatus").textContent =
+                    "Standby";
+
+            };
+
+            state.recognition.onerror =
+                event => {
+
+                    state.listening = false;
+
+                    $("#voiceStatus").textContent =
+                        "Voice error: " +
+                        event.error;
+
+                };
+
+        } else {
+
+            $("#voiceStatus").textContent =
+                "Speech recognition is not supported in this browser.";
+
+        }
+
+        $("#voiceButton").addEventListener(
+            "click",
+            toggleRecognition
+        );
+
+        $("#voiceStart").addEventListener(
+            "click",
+            toggleRecognition
+        );
+
+        loadVoices();
+
+        speechSynthesis.onvoiceschanged =
+            loadVoices;
+
+        $("#testVoice").addEventListener(
+            "click",
+            () => {
+
+                speak(
+                    "Quantum voice system online."
+                );
+
+            }
+        );
+    }
+
+    function toggleRecognition() {
+
+        if (!state.recognition) {
+
+            toast(
+                "Speech recognition is not supported here."
+            );
+
+            return;
+        }
+
+        if (state.listening) {
+
+            state.recognition.stop();
+
+        } else {
+
+            state.recognition.start();
+
+        }
+    }
+
+    function loadVoices() {
+
+        state.voices =
+            speechSynthesis.getVoices();
+
+        const select =
+            $("#voiceSelect");
+
+        select.innerHTML = "";
+
+        state.voices.forEach(
+            (voice, index) => {
+
+                const option =
+                    document.createElement("option");
+
+                option.value = index;
+
+                option.textContent =
+                    `${voice.name} — ${voice.lang}`;
+
+                select.appendChild(option);
+
+            }
+        );
+    }
+
+    function speak(text) {
+
+        if (!("speechSynthesis" in window)) {
+
+            toast(
+                "Speech synthesis is not supported."
+            );
+
+            return;
+        }
+
+        speechSynthesis.cancel();
+
+        const utterance =
+            new SpeechSynthesisUtterance(
+                text.replace(/[*#`]/g, "")
+            );
+
+        const index =
+            Number($("#voiceSelect").value);
+
+        if (state.voices[index]) {
+            utterance.voice =
+                state.voices[index];
+        }
+
+        utterance.rate = .95;
+        utterance.pitch = 1;
+
+        speechSynthesis.speak(utterance);
+    }
+
+    function speakIfEnabled(text) {
+
+        /*
+         * Set this to true if automatic AI voice
+         * responses are desired.
+         */
+        const autoVoice = false;
+
+        if (autoVoice) {
+            speak(text);
+        }
+    }
+
+    /* ----------------------------------------------------------
+       PARTICLE ENGINE
+       ---------------------------------------------------------- */
+
+    function startParticles() {
+
+        const canvas =
+            $("#particleCanvas");
+
+        const ctx =
+            canvas.getContext("2d");
+
+        let width;
+        let height;
+
+        const mouse = {
+            x: -1000,
+            y: -1000
+        };
+
+        const particles = [];
+
+        function resize() {
+
+            width =
+                canvas.width =
+                window.innerWidth *
+                devicePixelRatio;
+
+            height =
+                canvas.height =
+                window.innerHeight *
+                devicePixelRatio;
+
+            canvas.style.width =
+                window.innerWidth + "px";
+
+            canvas.style.height =
+                window.innerHeight + "px";
+
+            ctx.setTransform(
+                devicePixelRatio,
+                0,
+                0,
+                devicePixelRatio,
+                0,
+                0
+            );
+        }
+
+        resize();
+
+        window.addEventListener(
+            "resize",
+            resize
+        );
+
+        window.addEventListener(
+            "mousemove",
+            event => {
+
+                mouse.x = event.clientX;
+                mouse.y = event.clientY;
+
+            }
+        );
+
+        const count =
+            Math.min(
+                180,
+                Math.floor(
+                    window.innerWidth / 7
+                )
+            );
+
+        for (let i = 0; i < count; i++) {
+
+            particles.push({
+
+                x: Math.random() *
+                    window.innerWidth,
+
+                y: Math.random() *
+                    window.innerHeight,
+
+                vx:
+                    (Math.random() - .5) *
+                    .25,
+
+                vy:
+                    (Math.random() - .5) *
+                    .25,
+
+                r:
+                    Math.random() *
+                    1.6 + .2,
+
+                alpha:
+                    Math.random() *
+                    .7 + .1
+
+            });
+
+        }
+
+        function animate() {
+
+            if (
+                !state.settings.animations
+            ) {
+
+                ctx.clearRect(
+                    0,
+                    0,
+                    window.innerWidth,
+                    window.innerHeight
+                );
+
+                requestAnimationFrame(
+                    animate
+                );
+
+                return;
+            }
+
+            ctx.clearRect(
+                0,
+                0,
+                window.innerWidth,
+                window.innerHeight
+            );
+
+            for (const p of particles) {
+
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x < 0)
+                    p.x = window.innerWidth;
+
+                if (p.x > window.innerWidth)
+                    p.x = 0;
+
+                if (p.y < 0)
+                    p.y = window.innerHeight;
+
+                if (p.y > window.innerHeight)
+                    p.y = 0;
+
+                const dx =
+                    p.x - mouse.x;
+
+                const dy =
+                    p.y - mouse.y;
+
+                const distance =
+                    Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < 130) {
+
+                    p.x +=
+                        dx / distance * .7;
+
+                    p.y +=
+                        dy / distance * .7;
+
+                }
+
+                ctx.beginPath();
+
+                ctx.arc(
+                    p.x,
+                    p.y,
+                    p.r,
+                    0,
+                    Math.PI * 2
+                );
+
+                ctx.fillStyle =
+                    `rgba(0,234,255,${p.alpha})`;
+
+                ctx.fill();
+
+            }
+
+            requestAnimationFrame(
+                animate
+            );
+        }
+
+        animate();
+    }
+
+    /* ----------------------------------------------------------
+       SEARCH
+       ---------------------------------------------------------- */
+
+    function setupHistory() {
+
+        $("#historySearch").addEventListener(
+            "input",
+            event => {
+
+                renderHistory(
+                    event.target.value
+                );
+
+            }
+        );
+    }
+
+    /* ----------------------------------------------------------
+       FILE UTILITIES
+       ---------------------------------------------------------- */
+
+    function downloadFile(
+        content,
+        filename,
+        type
+    ) {
+
+        const blob =
+            new Blob(
+                [content],
+                { type }
+            );
+
+        const url =
+            URL.createObjectURL(blob);
+
+        const a =
+            document.createElement("a");
+
+        a.href = url;
+        a.download = filename;
+
+        document.body.appendChild(a);
+
+        a.click();
+
+        a.remove();
+
+        URL.revokeObjectURL(url);
+    }
+
+    /* ----------------------------------------------------------
+       TOAST
+       ---------------------------------------------------------- */
+
+    let toastTimer;
+
+    function toast(message) {
+
+        const element =
+            $("#toast");
+
+        element.textContent =
+            message;
+
+        element.classList.add("show");
+
+        clearTimeout(toastTimer);
+
+        toastTimer =
+            setTimeout(() => {
+
+                element.classList.remove(
+                    "show"
+                );
+
+            }, 2500);
+    }
+
+    /* ----------------------------------------------------------
+       CURSOR GLOW
+       ---------------------------------------------------------- */
+
+    function cursorGlow() {
+
+        const glow =
+            document.createElement("div");
+
+        glow.id =
+            "cursorGlow";
+
+        document.body.appendChild(
+            glow
+        );
+
+        window.addEventListener(
+            "mousemove",
+            event => {
+
+                glow.style.left =
+                    event.clientX + "px";
+
+                glow.style.top =
+                    event.clientY + "px";
+
+            }
+        );
+    }
+
+    /* ----------------------------------------------------------
+       IMAGE FILE IN CHAT
+       ---------------------------------------------------------- */
+
+    function setupChatImage() {
+
+        $("#imageInput").addEventListener(
+            "change",
+            event => {
+
+                const file =
+                    event.target.files[0];
+
+                if (!file) return;
+
+                switchView("image");
+
+                loadImage(file);
+
+            }
+        );
+    }
+
+    /* ----------------------------------------------------------
+       UTIL
+       ---------------------------------------------------------- */
+
+    function wait(ms) {
+
+        return new Promise(
+            resolve =>
+                setTimeout(resolve, ms)
+        );
+    }
+
+    /* ----------------------------------------------------------
+       INITIALIZATION
+       ---------------------------------------------------------- */
+
+    function init() {
+
+        loadState();
+
+        setupNavigation();
+
+        setupChat();
+
+        setupSettings();
+
+        setupImages();
+
+        setupVoice();
+
+        setupHistory();
+
+        setupChatImage();
+
+        setupAuth();
+
+        updateProfileUI();
+
+        $("#signOutBtn").addEventListener(
+            "click",
+            signOut
+        );
+
+        cursorGlow();
+
+        intro();
+
+        /*
+         * Start with a new local chat session.
+         */
+        createChat();
+    }
+
+    return {
+        init,
+        AI
+    };
+
+})();
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    Quantum.init
+);
+</script>
+
+</body>
+</html>
