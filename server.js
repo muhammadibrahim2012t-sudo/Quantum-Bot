@@ -1,5 +1,5 @@
 require("dotenv").config();
-const express = require("express");
+const express = require("path");
 const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
@@ -8,6 +8,8 @@ const OpenAI = require("openai");
 
 const app = express();
 const PORT = process.env.PORT || 8080;
+
+app.use(express.static(__dirname));
 
 // ── Security & middleware ──────────────────────────────────────
 app.use(helmet());
@@ -26,7 +28,7 @@ app.use("/api/", limiter);
 
 // ── Health check (Cloud Run loves this) ───────────────────────
 app.get("/", (req, res) => {
-  res.json({ status: "Quantum Core online ⚡", version: "1.0.0" });
+  res.sendFile(path.join(__dirname, "quantum-bot.html"));
 });
 
 app.get("/health", (req, res) => {
