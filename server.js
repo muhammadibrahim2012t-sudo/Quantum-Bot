@@ -13,7 +13,11 @@ const PORT = process.env.PORT || 8080;
 app.use(express.static(__dirname));
 
 // ── Security & middleware ──────────────────────────────────────
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: false
+  })
+);
 app.use(cors({
   origin: process.env.ALLOWED_ORIGIN || "*", // set this to your frontend URL in prod
   methods: ["GET", "POST", "OPTIONS"]
