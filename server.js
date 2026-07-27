@@ -63,7 +63,7 @@ app.post("/api/chat", async (req, res) => {
     // ── Google Gemini (recommended for Google Cloud) ──────────
     if (provider === "Google Gemini" || provider === "Gemini") {
       const genAI = new GoogleGenerativeAI(key);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
       // Convert chat history to Gemini format
       const history = messages.slice(0, -1).map(m => ({
