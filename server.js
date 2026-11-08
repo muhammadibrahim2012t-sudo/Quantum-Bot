@@ -79,37 +79,61 @@ app.post("/api/chat", async (req, res) => {
   }
 });
 
-// Real image generation endpoint. The OpenAI key stays on the server.
+// Free image generation via Pollinations.ai (no API key required).
 app.post("/api/images/generate", async (req, res) => {
   try {
     const prompt = typeof req.body?.prompt === "string" ? req.body.prompt.trim() : "";
     if (!prompt) return res.status(400).json({ error: "Please enter an image description." });
-    if (prompt.length > 4000) {
-      return res.status(400).json({ error: "Image descriptions must be 4,000 characters or fewer." });
-    }
-    if (!process.env.OPENAI_API_KEY) {
-      return res.status(503).json({ error: "Image generation is not configured. Add OPENAI_API_KEY in Vercel Environment Variables." });
+    if (prompt.length > 1000) {
+      return res.status(400).json({ error: "Image descriptions must be 1,000 characters or fewer." });
     }
 
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    const generated = await openai.images.generate({
-      model: process.env.OPENAI_IMAGE_MODEL || "gpt-image-1",
-      prompt,
-      size: "1024x1024"
+    const base = process.env.POLLINATIONS_URL || "https://image.pollinations.ai/prompt";
+    const params = new URLSearchParams({
+      model: process.env.POLLINATIONS_MODEL || "flux",
+      width: "1024",
+      height: "1024",
+      nologo: "true",
+      seed: String(Math.floor(Math.random() * 1e9))
     });
+    const url = `${base}/${encodeURIComponent(prompt)}?${params.toString()}`;
 
-    const imageBase64 = generated.data?.[0]?.b64_json;
-    if (!imageBase64) {
-      console.error("OpenAI image response did not include b64_json.");
-      return res.status(502).json({ error: "The image provider returned no image. Please try again." });
+    // Optional: a Pollinations token raises rate limits. Not required.
+    const headers = {};
+    if (process.env.POLLINATIONS_TOKEN) {
+      headers.Authorization = `Bearer ${process.env.POLLINATIONS_TOKEN}`;
     }
 
-    return res.json({ image: `data:image/png;base64,${imageBase64}` });
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 55000);
+    let upstream;
+    try {
+      upstream = await fetch(url, { headers, signal: controller.signal });
+    } finally {
+      clearTimeout(timer);
+    }
+
+    if (upstream.status === 429) {
+      return res.status(429).json({ error: "The free image service is busy. Wait about 15 seconds and try again." });
+    }
+    if (!upstream.ok) {
+      console.error("Pollinations returned status", upstream.status);
+      return res.status(502).json({ error: `The image service returned an error (${upstream.status}). Please try again.` });
+    }
+
+    const contentType = (upstream.headers.get("content-type") || "").split(";")[0];
+    if (!contentType.startsWith("image/")) {
+      console.error("Pollinations returned non-image content:", contentType);
+      return res.status(502).json({ error: "The image service did not return an image. Please try again." });
+    }
+
+    const buffer = Buffer.from(await upstream.arrayBuffer());
+    return res.json({ image: `data:${contentType};base64,${buffer.toString("base64")}` });
   } catch (err) {
     console.error("Quantum image generation error:", err);
-    const status = Number(err.status) || 500;
-    if (status === 401) return res.status(502).json({ error: "The image API key was rejected. Check OPENAI_API_KEY in Vercel." });
-    if (status === 429) return res.status(429).json({ error: "Image generation is busy or your API quota is unavailable. Check your OpenAI API billing and limits." });
+    if (err && err.name === "AbortError") {
+      return res.status(504).json({ error: "Image generation took too long. Please try again." });
+    }
     return res.status(500).json({ error: "Image generation failed. Check your Vercel function logs for details." });
   }
 });
