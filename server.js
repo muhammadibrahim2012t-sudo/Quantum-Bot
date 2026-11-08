@@ -80,7 +80,7 @@ app.post("/api/chat", async (req, res) => {
 });
 
 // Free image generation via Pollinations.ai (no API key required).
-app.post("/api/images/generate", async (req, res) => {
+app.post(["/api/image", "/api/images/generate"], async (req, res) => {
   try {
     const prompt = typeof req.body?.prompt === "string" ? req.body.prompt.trim() : "";
     if (!prompt) return res.status(400).json({ error: "Please enter an image description." });
