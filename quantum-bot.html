@@ -4687,7 +4687,7 @@ const Quantum = (() => {
                     toast(
                         "Live AI backend not reachable — showing a demo reply. " +
                         "Connect /api/chat on your server to enable " +
-                        state.provider + "."
+                        state.provider + ". Details: " + (error && error.message)
                     );
 
                 }
